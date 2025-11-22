@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Internship Recommendations – InternHub</title>
+    <link rel="stylesheet" href="./assets/css/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="navbar">
+        <div class="navbar-inner">
+          <div class="nav-brand">
+            <div class="nav-logo"></div>
+            <span>InternHub</span>
+          </div>
+          <nav class="nav-links">
+            <a href="./student-dashboard.html" class="nav-link">Dashboard</a>
+            <a href="./internship-recs.html" class="nav-link">Recommendations</a>
+            <a href="./progress-tracker.html" class="nav-link">Progress</a>
+            <a href="./chatbot.html" class="nav-link">Chatbot</a>
+          </nav>
+        </div>
+      </header>
+
+      <main class="main">
+        <section class="section">
+          <div class="card" style="margin-bottom: 1.5rem;">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Internship Recommendations</div>
+                <div class="card-subtitle">
+                  Search and filter based on your skills and interests
+                </div>
+              </div>
+            </div>
+
+            <!-- SEARCH BAR -->
+            <form
+              id="searchForm"
+              style="
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.75rem;
+                margin-top: 0.75rem;
+              "
+            >
+              <input
+                class="input"
+                style="flex: 1 1 200px;"
+                type="text"
+                id="searchKeywords"
+                placeholder="Search by keywords"
+              />
+              <input
+                class="input"
+                style="flex: 1 1 200px;"
+                type="text"
+                id="searchSkills"
+                placeholder="Filter by skills (e.g. Python, React)"
+              />
+              <button class="btn btn-primary" type="submit">Apply</button>
+            </form>
+          </div>
+
+          <!-- RECOMMENDATION CARDS -->
+          <div id="recsContainer" style="display: flex; flex-direction: column; gap: 1rem;">
+            <!-- Single card example -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Software Engineering Intern</div>
+                  <div class="card-subtitle">TechCorp · Remote</div>
+                </div>
+                <div class="badge badge-success">Match: 92%</div>
+              </div>
+              <p style="font-size: 0.85rem; color: var(--text-muted);">
+                Skills: Python, Django, REST APIs
+              </p>
+              <div style="display: flex; gap: 0.75rem; margin-top: 0.5rem;">
+                <button class="btn btn-ghost" type="button">View Details</button>
+                <button class="btn btn-primary" type="button">Apply</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Frontend Intern</div>
+                  <div class="card-subtitle">Designify · Bengaluru</div>
+                </div>
+                <div class="badge badge-warning">Match: 78%</div>
+              </div>
+              <p style="font-size: 0.85rem; color: var(--text-muted);">
+                Skills: HTML, CSS, JavaScript, React
+              </p>
+              <div style="display: flex; gap: 0.75rem; margin-top: 0.5rem;">
+                <button class="btn btn-ghost" type="button">View Details</button>
+                <button class="btn btn-primary" type="button">Apply</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        AI-powered Recommendations based on your profile and skills
+      </footer>
+    </div>
+
+    <script src="./assets/js/main.js"></script>
+    <script src="./assets/js/api.js"></script>
+    <script src="./assets/js/internship-recs.js"></script>
+  </body>
+</html>

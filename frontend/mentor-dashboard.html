@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Mentor Dashboard – InternHub</title>
+    <link rel="stylesheet" href="./assets/css/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="navbar">
+        <div class="navbar-inner">
+          <div class="nav-brand">
+            <div class="nav-logo"></div>
+            <span>InternHub</span>
+          </div>
+          <nav class="nav-links">
+            <a href="./mentor-dashboard.html" class="nav-link">Dashboard</a>
+            <a href="./chatbot.html" class="nav-link">Chatbot</a>
+            <a href="./login.html" class="nav-link">Logout</a>
+          </nav>
+        </div>
+      </header>
+
+      <main class="main">
+        <section class="section">
+          <div class="grid-2">
+            <!-- Students list -->
+            <div class="card">
+              <div class="card-title">Students List</div>
+              <ul
+                id="studentsList"
+                style="list-style: none; padding-left: 0; margin-top: 0.75rem;"
+              >
+                <li style="margin-bottom: 0.35rem;">
+                  - Student A
+                  <button
+                    class="btn btn-ghost"
+                    type="button"
+                    data-student="A"
+                    style="padding-inline: 0.75rem; font-size: 0.8rem;"
+                  >
+                    View
+                  </button>
+                </li>
+                <li style="margin-bottom: 0.35rem;">
+                  - Student B
+                  <button
+                    class="btn btn-ghost"
+                    type="button"
+                    data-student="B"
+                    style="padding-inline: 0.75rem; font-size: 0.8rem;"
+                  >
+                    View
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Student progress + feedback -->
+            <div class="card">
+              <div class="card-title">Student Progress & Feedback</div>
+              <div
+                id="mentorStudentProgress"
+                style="font-size: 0.85rem; color: var(--text-muted); margin: 0.5rem 0 0.75rem;"
+              >
+                Select a student to view progress.
+              </div>
+
+              <form id="feedbackForm" class="form-grid">
+                <div class="form-group">
+                  <label class="label" for="feedbackText">Write feedback</label>
+                  <textarea
+                    class="textarea"
+                    id="feedbackText"
+                    placeholder="Share feedback and suggestions..."
+                  ></textarea>
+                </div>
+                <button class="btn btn-primary" type="submit">
+                  Submit Feedback
+                </button>
+              </form>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        Mentor Dashboard · Track students · Share feedback
+      </footer>
+    </div>
+
+    <script src="./assets/js/main.js"></script>
+    <script src="./assets/js/api.js"></script>
+    <script src="./assets/js/mentor-dashboard.js"></script>
+  </body>
+</html>

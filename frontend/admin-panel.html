@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Admin Panel – InternHub</title>
+    <link rel="stylesheet" href="./assets/css/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="navbar">
+        <div class="navbar-inner">
+          <div class="nav-brand">
+            <div class="nav-logo"></div>
+            <span>InternHub</span>
+          </div>
+          <nav class="nav-links">
+            <a href="./admin-panel.html" class="nav-link">Admin Panel</a>
+            <a href="./login.html" class="nav-link">Logout</a>
+          </nav>
+        </div>
+      </header>
+
+      <main class="main">
+        <section class="section">
+          <div class="card" style="margin-bottom: 1.5rem;">
+            <div class="card-title">Admin Controls</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem;">
+              <button class="btn btn-ghost" type="button">Manage Users</button>
+              <button class="btn btn-ghost" type="button">
+                Manage Internships
+              </button>
+              <button class="btn btn-ghost" type="button">Logs</button>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <!-- Add internship form -->
+            <div class="card">
+              <div class="card-title">Add Internship</div>
+              <form id="addInternshipForm" class="form-grid" style="margin-top: 0.75rem;">
+                <div class="form-group">
+                  <label class="label" for="intTitle">Title</label>
+                  <input class="input" id="intTitle" required />
+                </div>
+                <div class="form-group">
+                  <label class="label" for="intCompany">Company</label>
+                  <input class="input" id="intCompany" required />
+                </div>
+                <div class="form-group">
+                  <label class="label" for="intLocation">Location</label>
+                  <input class="input" id="intLocation" />
+                </div>
+                <div class="form-group">
+                  <label class="label" for="intSkills">Required Skills</label>
+                  <input
+                    class="input"
+                    id="intSkills"
+                    placeholder="e.g. Python, SQL"
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="label" for="intIndustry">Industry</label>
+                  <input class="input" id="intIndustry" />
+                </div>
+                <button class="btn btn-primary" type="submit">
+                  Add Internship
+                </button>
+              </form>
+            </div>
+
+            <!-- View applications -->
+            <div class="card">
+              <div class="card-title">Applications</div>
+              <table class="table" style="margin-top: 0.75rem; font-size: 0.8rem;">
+                <thead>
+                  <tr>
+                    <th>Student</th>
+                    <th>Internship</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="adminApplicationsBody">
+                  <tr>
+                    <td>Student A</td>
+                    <td>Software Engineering Intern</td>
+                    <td><span class="badge badge-success">Accepted</span></td>
+                  </tr>
+                  <tr>
+                    <td>Student B</td>
+                    <td>Frontend Intern</td>
+                    <td><span class="badge badge-warning">Pending</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        Admin Panel · Manage users, internships, and system logs
+      </footer>
+    </div>
+
+    <script src="./assets/js/main.js"></script>
+    <script src="./assets/js/api.js"></script>
+    <script src="./assets/js/admin-panel.js"></script>
+  </body>
+</html>

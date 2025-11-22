@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Progress Tracker – InternHub</title>
+    <link rel="stylesheet" href="./assets/css/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="navbar">
+        <div class="navbar-inner">
+          <div class="nav-brand">
+            <div class="nav-logo"></div>
+            <span>InternHub</span>
+          </div>
+          <nav class="nav-links">
+            <a href="./student-dashboard.html" class="nav-link">Dashboard</a>
+            <a href="./internship-recs.html" class="nav-link">Recommendations</a>
+            <a href="./progress-tracker.html" class="nav-link">Progress</a>
+            <a href="./chatbot.html" class="nav-link">Chatbot</a>
+          </nav>
+        </div>
+      </header>
+
+      <main class="main">
+        <section class="section">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Progress Tracker</div>
+                <div class="card-subtitle">
+                  Track milestones, upload deliverables, and view mentor feedback
+                </div>
+              </div>
+            </div>
+
+            <!-- Milestones list -->
+            <div style="margin-top: 0.75rem; margin-bottom: 1rem;">
+              <div style="font-size: 0.9rem; margin-bottom: 0.5rem;">
+                Milestones
+              </div>
+              <ul style="list-style: none; padding-left: 0; font-size: 0.9rem;">
+                <li style="margin-bottom: 0.25rem;">
+                  <label>
+                    <input type="checkbox" />
+                    Task 1: Resume Submission
+                  </label>
+                </li>
+                <li style="margin-bottom: 0.25rem;">
+                  <label>
+                    <input type="checkbox" checked />
+                    Task 2: Interview Completed
+                  </label>
+                </li>
+                <li style="margin-bottom: 0.25rem;">
+                  <label>
+                    <input type="checkbox" />
+                    Task 3: Weekly Report
+                  </label>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Upload deliverable -->
+            <div
+              style="
+                border-top: 1px solid rgba(31, 41, 55, 0.8);
+                padding-top: 1rem;
+                margin-top: 0.5rem;
+              "
+            >
+              <form
+                id="uploadForm"
+                style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;"
+              >
+                <span style="font-size: 0.9rem;">Upload Deliverable:</span>
+                <input
+                  type="file"
+                  id="deliverableFile"
+                  style="
+                    font-size: 0.8rem;
+                    color: var(--text-muted);
+                    max-width: 240px;
+                  "
+                />
+                <button class="btn btn-primary" type="submit">Submit</button>
+              </form>
+            </div>
+
+            <!-- Mentor feedback -->
+            <div
+              style="
+                border-top: 1px solid rgba(31, 41, 55, 0.8);
+                padding-top: 1rem;
+                margin-top: 1rem;
+              "
+            >
+              <div style="font-size: 0.9rem; margin-bottom: 0.4rem;">
+                Mentor Feedback:
+              </div>
+              <p
+                id="mentorFeedbackText"
+                style="font-size: 0.85rem; color: var(--text-muted);"
+              >
+                "Good progress, improve documentation"
+              </p>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        Keep your milestones up to date for your mentor and admin
+      </footer>
+    </div>
+
+    <script src="./assets/js/main.js"></script>
+    <script src="./assets/js/api.js"></script>
+    <script src="./assets/js/progress-tracker.js"></script>
+  </body>
+</html>

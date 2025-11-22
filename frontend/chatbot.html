@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>AI Career Chatbot – InternHub</title>
+    <link rel="stylesheet" href="./assets/css/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="navbar">
+        <div class="navbar-inner">
+          <div class="nav-brand">
+            <div class="nav-logo"></div>
+            <span>InternHub</span>
+          </div>
+          <nav class="nav-links">
+            <a href="./student-dashboard.html" class="nav-link">Dashboard</a>
+            <a href="./internship-recs.html" class="nav-link">Recommendations</a>
+            <a href="./progress-tracker.html" class="nav-link">Progress</a>
+            <a href="./chatbot.html" class="nav-link">Chatbot</a>
+          </nav>
+        </div>
+      </header>
+
+      <main class="main">
+        <section class="section">
+          <div class="chat-container">
+            <div>
+              <h1 style="margin-bottom: 0.25rem;">AI Career Chatbot</h1>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">
+                Ask internship-related questions and get guidance.
+              </p>
+            </div>
+
+            <div id="chatWindow" class="chat-window">
+              <!-- Example conversation -->
+              <div class="chat-message user">
+                User: Suggest internships
+              </div>
+              <div class="chat-message bot">
+                Bot: Here are top matches based on your skills and interests...
+              </div>
+            </div>
+
+            <form id="chatForm" class="chat-input-row">
+              <input
+                id="chatInput"
+                class="input"
+                style="border-radius: 999px; flex: 1 1 auto;"
+                type="text"
+                placeholder="Type message here..."
+                required
+              />
+              <button class="btn btn-primary" type="submit">Send</button>
+            </form>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        Chatbot · Intelligent guidance system for internships
+      </footer>
+    </div>
+
+    <script src="./assets/js/main.js"></script>
+    <script src="./assets/js/api.js"></script>
+    <script src="./assets/js/chatbot.js"></script>
+  </body>
+</html>

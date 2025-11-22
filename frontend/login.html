@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>InternHub – Login / Register</title>
+    <link rel="stylesheet" href="./assets/css/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="navbar">
+        <div class="navbar-inner">
+          <div class="nav-brand">
+            <div class="nav-logo"></div>
+            <span>InternHub</span>
+          </div>
+          <nav class="nav-links">
+            <a href="./index.html" class="nav-link">Home</a>
+            <a href="./login.html" class="nav-link">Login</a>
+          </nav>
+        </div>
+      </header>
+
+      <main class="main">
+        <section class="section">
+          <div class="auth-wrapper">
+            <div class="card">
+              <div class="auth-toggle">
+                <button id="loginToggle" class="btn btn-primary" type="button">
+                  Login
+                </button>
+                <button id="registerToggle" class="btn btn-ghost" type="button">
+                  Register
+                </button>
+              </div>
+
+              <!-- LOGIN FORM -->
+              <form id="loginForm" class="form-grid">
+                <div class="form-group">
+                  <label class="label" for="loginEmail">Email</label>
+                  <input class="input" id="loginEmail" type="email" required />
+                </div>
+                <div class="form-group">
+                  <label class="label" for="loginPassword">Password</label>
+                  <input
+                    class="input"
+                    id="loginPassword"
+                    type="password"
+                    required
+                  />
+                </div>
+                <button class="btn btn-primary" type="submit">Login</button>
+              </form>
+
+              <!-- REGISTER FORM -->
+              <form
+                id="registerForm"
+                class="form-grid"
+                style="margin-top: 1rem; display: none;"
+              >
+                <div class="form-group">
+                  <label class="label" for="regName">Full Name</label>
+                  <input class="input" id="regName" type="text" required />
+                </div>
+                <div class="form-group">
+                  <label class="label" for="regEmail">Email</label>
+                  <input class="input" id="regEmail" type="email" required />
+                </div>
+                <div class="form-group">
+                  <label class="label" for="regPassword">Password</label>
+                  <input
+                    class="input"
+                    id="regPassword"
+                    type="password"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="label" for="regRole">Role</label>
+                  <select class="select" id="regRole" required>
+                    <option value="student">Student</option>
+                    <option value="mentor">Mentor</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+                <button class="btn btn-primary" type="submit">
+                  Register
+                </button>
+              </form>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        © 2025 InternHub · Secure Login & Role-based Access
+      </footer>
+    </div>
+
+    <script src="./assets/js/main.js"></script>
+    <script src="./assets/js/api.js"></script>
+    <script src="./assets/js/auth.js"></script>
+  </body>
+</html>
