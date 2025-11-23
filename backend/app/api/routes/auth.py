@@ -1,12 +1,19 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from pydantic import BaseModel
+# backend/app/api/routes/auth.py
+
 from datetime import timedelta
 
-from app.db.database import get_db
-from app.db import models
-from app.core.security import create_access_token, verify_password, get_password_hash
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
+from sqlalchemy.orm import Session
+
 from app.core.config import settings
+from app.core.security import (
+    create_access_token,
+    get_password_hash,
+    verify_password,
+)
+from app.db import models
+from app.db.database import get_db
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -15,7 +22,7 @@ class UserCreate(BaseModel):
     email: str
     password: str
     full_name: str
-    role: str  # student, mentor, admin
+    role: str  # "student", "mentor", "admin"
 
 
 class UserLogin(BaseModel):
@@ -37,6 +44,13 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     )
     db.add(new_user)
     db.commit()
+    db.refresh(new_user)
+
+    # Optionally auto-create Student row for student role
+    if user.role == "student":
+        student = models.Student(user_id=new_user.id, skills="")
+        db.add(student)
+        db.commit()
 
     token = create_access_token({"sub": str(new_user.id), "role": new_user.role})
     return {"access_token": token, "token_type": "bearer"}

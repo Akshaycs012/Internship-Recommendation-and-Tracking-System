@@ -1,4 +1,7 @@
+# backend/app/api/routes/admin.py
+
 from fastapi import APIRouter, Depends
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
@@ -8,24 +11,45 @@ from app.db import models
 router = APIRouter(prefix="/admin", tags=["admin"])
 
 
+class InternshipCreate(BaseModel):
+    title: str
+    company: str
+    location: str | None = None
+    skills: str | None = None
+    industry: str | None = None
+
+
 @router.post("/internships")
 def add_internship(
-    title: str,
-    company: str,
-    location: str = "",
-    skills: str = "",
-    industry: str = "",
+    data: InternshipCreate,
     db: Session = Depends(get_db),
-    user=Depends(get_current_user)
+    user=Depends(get_current_user),
 ):
     internship = models.Internship(
-        title=title,
-        company=company,
-        location=location,
-        required_skills=skills,
-        industry=industry,
+        title=data.title,
+        company=data.company,
+        location=data.location or "",
+        required_skills=data.skills or "",
+        industry=data.industry or "",
     )
     db.add(internship)
     db.commit()
+    db.refresh(internship)
+    return {"id": internship.id, "message": "Internship added"}
 
-    return {"message": "Internship added"}
+
+@router.get("/applications")
+def list_applications(
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+):
+    apps = db.query(models.Application).all()
+    return [
+        {
+            "id": a.id,
+            "student_id": a.student_id,
+            "internship_id": a.internship_id,
+            "status": a.status,
+        }
+        for a in apps
+    ]
