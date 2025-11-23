@@ -53,7 +53,13 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
         db.commit()
 
     token = create_access_token({"sub": str(new_user.id), "role": new_user.role})
-    return {"access_token": token, "token_type": "bearer"}
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "role": new_user.role
+    }
+
+
 
 
 @router.post("/login")
@@ -66,4 +72,8 @@ def login(user: UserLogin, db: Session = Depends(get_db)):
         {"sub": str(db_user.id), "role": db_user.role},
         timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
     )
-    return {"access_token": token, "token_type": "bearer"}
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "role": db_user.role
+    }
