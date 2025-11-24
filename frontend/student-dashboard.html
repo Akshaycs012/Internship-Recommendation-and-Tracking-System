@@ -95,4 +95,10 @@
     <script src="./assets/js/api.js"></script>
     <script src="./assets/js/student-dashboard.js"></script>
   </body>
+  <script>
+  if (!localStorage.getItem("access_token")) {
+    window.location.href = "./login.html";
+  }
+</script>
+
 </html>

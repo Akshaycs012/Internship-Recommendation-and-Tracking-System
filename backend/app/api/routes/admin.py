@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user
+from app.api.deps import require_admin
 from app.db.database import get_db
 from app.db import models
 
@@ -23,7 +23,7 @@ class InternshipCreate(BaseModel):
 def add_internship(
     data: InternshipCreate,
     db: Session = Depends(get_db),
-    user=Depends(get_current_user),
+    admin_user=Depends(require_admin),  # only admins
 ):
     internship = models.Internship(
         title=data.title,
@@ -41,7 +41,7 @@ def add_internship(
 @router.get("/applications")
 def list_applications(
     db: Session = Depends(get_db),
-    user=Depends(get_current_user),
+    admin_user=Depends(require_admin),  # only admins
 ):
     apps = db.query(models.Application).all()
     return [

@@ -18,3 +18,7 @@ def get_db():
         yield db
     finally:
         db.close()
+
+# ✅ VERY IMPORTANT
+from app.db import models
+Base.metadata.create_all(bind=engine)

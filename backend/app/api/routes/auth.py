@@ -30,6 +30,8 @@ class UserLogin(BaseModel):
     password: str
 
 
+# backend/app/api/routes/auth.py
+
 @router.post("/register")
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
     existing = db.query(models.User).filter(models.User.email == user.email).first()
@@ -46,21 +48,22 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
 
-    # Optionally auto-create Student row for student role
+    # ✅ Create role-specific row
     if user.role == "student":
-        student = models.Student(user_id=new_user.id, skills="")
-        db.add(student)
-        db.commit()
+        db.add(models.Student(user_id=new_user.id, skills=""))
+    elif user.role == "mentor":
+        db.add(models.Mentor(user_id=new_user.id, expertise=""))
+    elif user.role == "admin":
+        db.add(models.Admin(user_id=new_user.id))
+
+    db.commit()
 
     token = create_access_token({"sub": str(new_user.id), "role": new_user.role})
     return {
         "access_token": token,
         "token_type": "bearer",
-        "role": new_user.role
+        "role": new_user.role,
     }
-
-
-
 
 @router.post("/login")
 def login(user: UserLogin, db: Session = Depends(get_db)):
@@ -72,8 +75,10 @@ def login(user: UserLogin, db: Session = Depends(get_db)):
         {"sub": str(db_user.id), "role": db_user.role},
         timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
     )
+
     return {
         "access_token": token,
         "token_type": "bearer",
         "role": db_user.role
     }
+   

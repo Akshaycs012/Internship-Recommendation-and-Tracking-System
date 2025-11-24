@@ -1,5 +1,7 @@
 # backend/app/api/deps.py
 
+from typing import Literal
+
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
@@ -15,7 +17,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 def get_current_user(
     token: str = Depends(oauth2_scheme),
     db: Session = Depends(get_db),
-):
+) -> models.User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -38,4 +40,32 @@ def get_current_user(
     if user is None:
         raise credentials_exception
 
+    return user
+
+
+def require_role(role: Literal["student", "mentor", "admin"]):
+    """
+    Dependency factory: require a specific role.
+    Usage in routes:  user = Depends(require_role("admin"))
+    """
+    def _wrapper(user: models.User = Depends(get_current_user)):
+        if user.role != role:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Requires {role} role",
+            )
+        return user
+
+    return _wrapper
+
+
+def require_admin(user: models.User = Depends(require_role("admin"))):
+    return user
+
+
+def require_mentor(user: models.User = Depends(require_role("mentor"))):
+    return user
+
+
+def require_student(user: models.User = Depends(require_role("student"))):
     return user
