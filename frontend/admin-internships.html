@@ -1,0 +1,106 @@
+<!-- frontend/admin-internships.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Manage Internships – InternHub</title>
+
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+
+<body>
+<div class="app-shell">
+
+    <header class="navbar">
+        <div class="navbar-inner">
+            <div class="nav-brand">
+                <div class="nav-logo"></div><span>InternHub</span>
+            </div>
+            <nav class="nav-links">
+                <a href="./admin-panel.html" class="nav-link">Admin Panel</a>
+                <a href="./login.html" class="nav-link">Logout</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <section class="section">
+
+            <div class="grid-2">
+
+                <!-- INTERNSHIP LIST -->
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Internships Overview</div>
+                            <div class="card-subtitle">Select an internship to review applicants</div>
+                        </div>
+                    </div>
+
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Company</th>
+                            <th>Industry</th>
+                            <th>Select</th>
+                        </tr>
+                        </thead>
+                        <tbody id="internshipsBody">
+                        <tr><td colspan="4">Loading internships...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+
+                <!-- APPLICANTS PANEL -->
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Applications</div>
+                            <div class="card-subtitle">Review internship applicants</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom:10px;display:flex;gap:8px;">
+                        <button class="btn" data-filter="all">All</button>
+                        <button class="btn btn-primary" data-filter="pending">Pending</button>
+                        <button class="btn" data-filter="approved">Approved</button>
+                        <button class="btn" data-filter="rejected">Rejected</button>
+                    </div>
+
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody id="appsBody">
+                        <tr><td colspan="4">Select internship first</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+        </section>
+    </main>
+
+    <footer class="footer">Manage internships & applications</footer>
+</div>
+
+
+<script src="/static/js/api.js"></script>
+<script src="/static/js/main.js"></script>
+<script type="module" src="/static/js/admin-internships.js"></script>
+
+<script>
+if (!localStorage.getItem("access_token")) {
+    window.location.href = "login.html";
+}
+</script>
+</body>
+</html>

@@ -1,9 +1,14 @@
+<!-- frontend/progress-tracker.html -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <title>Progress Tracker – InternHub</title>
-    <link rel="stylesheet" href="./assets/css/styles.css" />
+   <link rel="stylesheet" href="/static/css/styles.css">
+<script src="/static/js/api.js"></script>
+<script src="/static/js/main.js"></script>
+
+
   </head>
   <body>
     <div class="app-shell">
@@ -29,81 +34,96 @@
               <div>
                 <div class="card-title">Progress Tracker</div>
                 <div class="card-subtitle">
-                  Track milestones, upload deliverables, and view mentor feedback
+                  View assigned tasks, upload deliverables, and track submission
+                  status.
                 </div>
               </div>
             </div>
 
-            <!-- Milestones list -->
-            <div style="margin-top: 0.75rem; margin-bottom: 1rem;">
-              <div style="font-size: 0.9rem; margin-bottom: 0.5rem;">
-                Milestones
-              </div>
-              <ul style="list-style: none; padding-left: 0; font-size: 0.9rem;">
-                <li style="margin-bottom: 0.25rem;">
-                  <label>
-                    <input type="checkbox" />
-                    Task 1: Resume Submission
-                  </label>
-                </li>
-                <li style="margin-bottom: 0.25rem;">
-                  <label>
-                    <input type="checkbox" checked />
-                    Task 2: Interview Completed
-                  </label>
-                </li>
-                <li style="margin-bottom: 0.25rem;">
-                  <label>
-                    <input type="checkbox" />
-                    Task 3: Weekly Report
-                  </label>
-                </li>
-              </ul>
-            </div>
-
-            <!-- Upload deliverable -->
+            <!-- LIVE TASK SUMMARY -->
             <div
+              id="liveTaskSummary"
               style="
-                border-top: 1px solid rgba(31, 41, 55, 0.8);
-                padding-top: 1rem;
-                margin-top: 0.5rem;
+                margin-top: 0.75rem;
+                margin-bottom: 1rem;
+                padding: 0.75rem 0.9rem;
+                border-radius: 0.75rem;
+                background: rgba(15, 23, 42, 0.9);
+                border: 1px solid rgba(55, 65, 81, 0.8);
+                font-size: 0.9rem;
               "
             >
-              <form
-                id="uploadForm"
-                style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;"
+              <div id="liveTaskTitle">No active task selected.</div>
+              <div id="liveTaskMeta" style="color: var(--text-muted);">
+                Select a task from the list below to upload your work.
+              </div>
+            </div>
+
+            <!-- TASK LIST TABLE -->
+            <div style="margin-top: 0.5rem;">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Task</th>
+                    <th>Internship</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Submitted</th>
+                  </tr>
+                </thead>
+                <tbody id="tasksBody">
+                  <tr>
+                    <td colspan="6" style="color: var(--text-muted);">
+                      Loading tasks...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- UPLOAD AREA (VISIBLE WHEN TASK SELECTED) -->
+            <div
+              id="uploadSection"
+              style="
+                border-top: 1px solid rgba(31, 41, 55, 0.9);
+                margin-top: 1.25rem;
+                padding-top: 1rem;
+                display: none;
+              "
+            >
+              <div
+                style="
+                  font-size: 0.9rem;
+                  margin-bottom: 0.5rem;
+                  font-weight: 500;
+                "
               >
-                <span style="font-size: 0.9rem;">Upload Deliverable:</span>
+                Submit work for: <span id="selectedTaskLabel"></span>
+              </div>
+              <form
+                id="taskUploadForm"
+                style="
+                  display: flex;
+                  flex-wrap: wrap;
+                  gap: 0.75rem;
+                  align-items: center;
+                "
+              >
                 <input
                   type="file"
                   id="deliverableFile"
                   style="
                     font-size: 0.8rem;
                     color: var(--text-muted);
-                    max-width: 240px;
+                    max-width: 260px;
                   "
+                  required
                 />
-                <button class="btn btn-primary" type="submit">Submit</button>
+                <button class="btn btn-primary" type="submit">
+                  Upload &amp; Submit
+                </button>
               </form>
-            </div>
-
-            <!-- Mentor feedback -->
-            <div
-              style="
-                border-top: 1px solid rgba(31, 41, 55, 0.8);
-                padding-top: 1rem;
-                margin-top: 1rem;
-              "
-            >
-              <div style="font-size: 0.9rem; margin-bottom: 0.4rem;">
-                Mentor Feedback:
-              </div>
-              <p
-                id="mentorFeedbackText"
-                style="font-size: 0.85rem; color: var(--text-muted);"
-              >
-                "Good progress, improve documentation"
-              </p>
             </div>
           </div>
         </section>
@@ -116,12 +136,11 @@
 
     <script src="./assets/js/main.js"></script>
     <script src="./assets/js/api.js"></script>
-    <script src="./assets/js/progress-tracker.js"></script>
+    <script type="module" src="./assets/js/progress-tracker.js"></script>
   </body>
   <script>
-  if (!localStorage.getItem("access_token")) {
-    window.location.href = "./login.html";
-  }
-</script>
-
+    if (!localStorage.getItem("access_token")) {
+      window.location.href = "./login.html";
+    }
+  </script>
 </html>

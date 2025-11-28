@@ -1,85 +1,53 @@
-import { apiRequest, setAuthToken } from "./api.js";
-
-
-
+import { apiRequest, setAuthToken } from "/static/js/api.js";
 
 document.addEventListener("DOMContentLoaded", () => {
-  const loginToggle = document.getElementById("loginToggle");
-  const registerToggle = document.getElementById("registerToggle");
   const loginForm = document.getElementById("loginForm");
   const registerForm = document.getElementById("registerForm");
+  const loginToggle = document.getElementById("loginToggle");
+  const registerToggle = document.getElementById("registerToggle");
 
-  function showLogin() {
-    loginForm.style.display = "grid";
-    registerForm.style.display = "none";
-    loginToggle.classList.add("btn-primary");
-    registerToggle.classList.remove("btn-primary");
-  }
+  function showLogin(){ loginForm.style.display="grid"; registerForm.style.display="none"; }
+  function showRegister(){ loginForm.style.display="none"; registerForm.style.display="grid"; }
 
-  function showRegister() {
-    loginForm.style.display = "none";
-    registerForm.style.display = "grid";
-    loginToggle.classList.remove("btn-primary");
-    registerToggle.classList.add("btn-primary");
-  }
+  loginToggle.onclick = showLogin;
+  registerToggle.onclick = showRegister;
 
-  loginToggle.addEventListener("click", showLogin);
-  registerToggle.addEventListener("click", showRegister);
+  if(location.hash==="#register") showRegister();
 
-  if (window.location.hash === "#register") showRegister();
-
-  // ✅ LOGIN CONNECTION
-  loginForm.addEventListener("submit", async (e) => {
+  loginForm.onsubmit = async(e)=>{
     e.preventDefault();
+    const email = loginEmail.value;
+    const password = loginPassword.value;
 
-    const email = document.getElementById("loginEmail").value;
-    const password = document.getElementById("loginPassword").value;
-
-    try {
-      const res = await apiRequest("/auth/login", {
-        method: "POST",
-        body: JSON.stringify({ email, password }),
+    try{
+      const res = await apiRequest("/auth/login",{
+        method:"POST", body:JSON.stringify({email,password})
       });
-
       setAuthToken(res.access_token);
+      const role = JSON.parse(atob(res.access_token.split('.')[1])).role;
+      location.href = role==="student" ? "/student-dashboard.html" :
+                      role==="mentor" ? "/mentor-dashboard.html" :
+                      "/admin-panel.html";
+    }catch(e){ alert("Login failed"); }
+  };
 
-      // ✅ Decode JWT to get role
-      const payload = JSON.parse(atob(res.access_token.split(".")[1]));
-      const role = payload.role;
-
-      if (role === "student") window.location.href = "./student-dashboard.html";
-      else if (role === "mentor") window.location.href = "./mentor-dashboard.html";
-      else if (role === "admin") window.location.href = "./admin-panel.html";
-      else alert("Unknown role");
-
-    } catch (err) {
-      alert("Login failed");
-    }
-  });
-
-  // ✅ REGISTER CONNECTION
-  registerForm.addEventListener("submit", async (e) => {
+  registerForm.onsubmit = async(e)=>{
     e.preventDefault();
-
-    const full_name = document.getElementById("regName").value;
-    const email = document.getElementById("regEmail").value;
-    const password = document.getElementById("regPassword").value;
-    const role = document.getElementById("regRole").value;
-
-    try {
-      const res = await apiRequest("/auth/register", {
-        method: "POST",
-        body: JSON.stringify({ full_name, email, password, role }),
+    try{
+      const res = await apiRequest("/auth/register",{
+        method:"POST",
+        body:JSON.stringify({
+          full_name:regName.value,
+          email:regEmail.value,
+          password:regPassword.value,
+          role:regRole.value
+        })
       });
-
       setAuthToken(res.access_token);
+      location.href = regRole.value==="student"?"/student-dashboard.html":
+                      regRole.value==="mentor"?"/mentor-dashboard.html":
+                      "/admin-panel.html";
 
-      if (role === "student") window.location.href = "./student-dashboard.html";
-      else if (role === "mentor") window.location.href = "./mentor-dashboard.html";
-      else window.location.href = "./admin-panel.html";
-
-    } catch (err) {
-      alert("Registration failed");
-    }
-  });
+    }catch(e){ alert("Registration failed"); }
+  };
 });

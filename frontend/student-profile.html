@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Student Profile – InternHub</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+<script src="/static/js/api.js"></script>
+<script src="/static/js/main.js"></script>
+
+
+  </head>
+  <body>
+    <div class="app-shell">
+      <!-- Top Navbar -->
+      <header class="navbar">
+        <div class="navbar-inner">
+          <div class="nav-brand">
+            <div class="nav-logo"></div>
+            <span>InternHub</span>
+          </div>
+          <nav class="nav-links">
+            <a href="./student-dashboard.html" class="nav-link">Dashboard</a>
+            <a href="./student-recommendations.html" class="nav-link">Recommendations</a>
+            <a href="./student-progress.html" class="nav-link">Progress</a>
+            <a href="./student-profile.html" class="nav-link nav-link--active">Profile</a>
+            <a href="./chatbot.html" class="nav-link">Chatbot</a>
+            <a href="./login.html" class="nav-link">Logout</a>
+          </nav>
+        </div>
+      </header>
+
+      <main class="main">
+        <div class="dashboard-layout">
+          <!-- Sidebar -->
+          <aside class="sidebar">
+            <div class="sidebar-title">Student</div>
+            <a href="./student-dashboard.html" class="sidebar-link">Dashboard</a>
+            <a href="./student-recommendations.html" class="sidebar-link">Recommendations</a>
+            <a href="./student-progress.html" class="sidebar-link">Progress</a>
+            <a href="./student-profile.html" class="sidebar-link sidebar-link--active">Profile</a>
+            <a href="./chatbot.html" class="sidebar-link">Chatbot</a>
+            <a href="./login.html" class="sidebar-link">Logout</a>
+          </aside>
+
+          <!-- Main Profile Content -->
+          <section class="section">
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Profile Overview</div>
+                  <div class="card-subtitle">
+                    Manage your skills and resume. Recommendations use this data when you keep the skills filter empty.
+                  </div>
+                </div>
+              </div>
+
+              <div style="display: grid; gap: 1.5rem; margin-top: 1rem;">
+                <div>
+                  <div class="card-subtitle">Basic Info</div>
+                  <div style="margin-top: 0.5rem; font-size: 0.9rem;">
+                    <div><strong>Name:</strong> <span id="profileName">—</span></div>
+                    <div><strong>Email:</strong> <span id="profileEmail">—</span></div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="label">Skills (comma separated)</label>
+                  <textarea
+                    id="skillsInput"
+                    class="textarea"
+                    placeholder="e.g. Python, FastAPI, SQL, React"
+                  ></textarea>
+                  <button id="saveSkillsBtn" class="btn btn-primary" style="margin-top: 0.5rem; align-self: flex-start;">
+                    Save Skills
+                  </button>
+                </div>
+
+                <div class="form-group">
+                  <label class="label">Upload Resume (PDF, DOCX, etc.)</label>
+                  <input id="resumeFile" type="file" class="input" />
+                  <button id="uploadResumeBtn" class="btn" style="margin-top: 0.5rem; align-self: flex-start;">
+                    Upload Resume
+                  </button>
+                  <div id="resumeLink" class="card-subtitle" style="margin-top: 0.5rem;">
+                    No resume uploaded yet.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+
+      <footer class="footer">
+        Student Profile · Skills · Resume · Contact details
+      </footer>
+    </div>
+
+    <script src="./assets/js/main.js"></script>
+    <script type="module" src="./assets/js/student-profile.js"></script>
+  </body>
+</html>

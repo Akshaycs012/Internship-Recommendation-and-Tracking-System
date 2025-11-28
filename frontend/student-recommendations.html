@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Recommendations – InternHub</title>
+
+  <!-- Correct global static load -->
+  <link rel="stylesheet" href="/static/css/styles.css">
+  <script type="module" src="/static/js/api.js"></script>
+  <script type="module" src="/static/js/main.js"></script>
+</head>
+
+<body>
+<div class="app-shell">
+
+  <header class="navbar">
+    <div class="navbar-inner">
+      <div class="nav-brand">
+        <div class="nav-logo"></div>
+        <span>InternHub</span>
+      </div>
+
+      <nav class="nav-links">
+        <a href="./student-dashboard.html" class="nav-link">Dashboard</a>
+        <a href="./student-recommendations.html" class="nav-link nav-link--active">Recommendations</a>
+        <a href="./progress-tracker.html" class="nav-link">Progress</a>
+        <a href="./student-profile.html" class="nav-link">Profile</a>
+        <a href="./chatbot.html" class="nav-link">Chatbot</a>
+        <a href="./login.html" class="nav-link">Logout</a>
+      </nav>
+    </div>
+  </header>
+
+
+  <main class="main">
+    <section class="section">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Internship Recommendations</div>
+            <div class="card-subtitle">Results come from internships posted by Admins</div>
+          </div>
+        </div>
+
+        <form id="searchForm" class="grid-2" style="margin-top:1rem;">
+          <input id="searchKeywords" class="input" placeholder="Search title / company">
+          <div style="display:flex;gap:.75rem;">
+            <input id="searchSkills" class="input" placeholder="comma skills OR empty = profile skills">
+            <button class="btn btn-primary" type="submit">Search</button>
+          </div>
+        </form>
+      </div>
+
+      <div id="recsList" style="margin-top:1.6rem;display:flex;flex-direction:column;gap:1rem;">
+        <!-- Filled by JS -->
+      </div>
+
+    </section>
+  </main>
+
+  <footer class="footer">InternHub Smart Recommendations Engine</footer>
+</div>
+
+<!-- FINAL FIX → correct JS boot -->
+<script type="module" src="/static/js/student-recommendations.js"></script>
+
+</body>
+</html>

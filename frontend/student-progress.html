@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Progress – InternHub</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+<script src="/static/js/api.js"></script>
+<script src="/static/js/main.js"></script>
+
+
+  </head>
+  <body>
+    <div class="app-shell">
+      <!-- Top Navbar -->
+      <header class="navbar">
+        <div class="navbar-inner">
+          <div class="nav-brand">
+            <div class="nav-logo"></div>
+            <span>InternHub</span>
+          </div>
+          <nav class="nav-links">
+            <a href="./student-dashboard.html" class="nav-link">Dashboard</a>
+            <a href="./student-recommendations.html" class="nav-link nav-link--active">Recommendations</a>
+            <a href="./student-progress.html" class="nav-link">Progress</a>
+            <a href="./student-profile.html" class="nav-link">Profile</a>
+            <a href="./chatbot.html" class="nav-link">Chatbot</a>
+            <a href="./login.html" class="nav-link">Logout</a>
+          </nav>
+        </div>
+      </header>
+
+      <main class="main">
+        <section class="section">
+          <!-- Active task summary -->
+          <div class="card" id="activeTaskCard">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Live Task</div>
+                <div class="card-subtitle">
+                  Closest upcoming assignment based on due date. You can still submit for any other task from the list below.
+                </div>
+              </div>
+            </div>
+
+            <div id="noActiveTask" style="font-size: 0.85rem; color: var(--text-muted);">
+              No active task right now. Once your admin assigns work, the closest due task will appear here.
+            </div>
+
+            <div id="activeTaskContent" style="display: none;">
+              <div style="margin-bottom: 0.75rem;">
+                <div id="activeTaskTitle" style="font-weight: 600; margin-bottom: 0.25rem;"></div>
+                <div id="activeTaskDates" class="card-subtitle"></div>
+                <div id="activeTaskStatus" style="margin-top: 0.35rem; font-size: 0.85rem;"></div>
+              </div>
+
+              <div class="form-grid" style="margin-top: 1rem;">
+                <div class="form-group">
+                  <label class="label">Upload Deliverable</label>
+                  <input id="activeTaskUpload" type="file" class="input" />
+                </div>
+                <div class="form-group">
+                  <label class="label">Work Summary / Feedback</label>
+                  <textarea
+                    id="activeTaskFeedback"
+                    class="textarea"
+                    placeholder="Describe what you completed or any blockers you faced"
+                  ></textarea>
+                </div>
+              </div>
+
+              <button id="activeTaskSubmitBtn" class="btn btn-primary" style="margin-top: 0.75rem;">
+                Submit Work
+              </button>
+            </div>
+          </div>
+
+          <!-- All tasks table -->
+          <div class="card" style="margin-top: 1.5rem;">
+            <div class="card-header">
+              <div>
+                <div class="card-title">All Assigned Tasks</div>
+                <div class="card-subtitle">
+                  Click a row to view details and submit work. Colours indicate submission status.
+                </div>
+              </div>
+            </div>
+
+            <div style="overflow-x: auto;">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Task</th>
+                    <th>Assigned</th>
+                    <th>Due</th>
+                    <th>Status</th>
+                    <th>Submission</th>
+                  </tr>
+                </thead>
+                <tbody id="tasksTableBody">
+                  <!-- Rows filled by JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <div class="card-subtitle" style="margin-top: 0.75rem;">
+              Legend:
+              <span class="badge badge-success" style="margin-left: 0.5rem;">Submitted</span>
+              <span class="badge badge-warning" style="margin-left: 0.5rem;">Late submit</span>
+              <span class="badge" style="margin-left: 0.5rem; border-color: rgba(248, 113, 113, 0.7); color: #fecaca;">
+                Not submitted
+              </span>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        Progress · Tasks · Deliverables · Mentor feedback
+      </footer>
+    </div>
+
+    <script src="./assets/js/main.js"></script>
+    <script type="module" src="./assets/js/student-progress.js"></script>
+  </body>
+</html>

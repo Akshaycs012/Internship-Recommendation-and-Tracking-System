@@ -1,104 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
+<head>
+    <meta charset="UTF-8">
     <title>Student Dashboard – InternHub</title>
-    <link rel="stylesheet" href="./assets/css/styles.css" />
-  </head>
-  <body>
-    <div class="app-shell">
-      <header class="navbar">
+    <link rel="stylesheet" href="/static/css/styles.css">
+<script src="/static/js/api.js"></script>
+<script src="/static/js/main.js"></script>
+
+
+</head>
+<body>
+
+<div class="app-shell">
+
+    <!-- NAVBAR -->
+    <header class="navbar">
         <div class="navbar-inner">
-          <div class="nav-brand">
-            <div class="nav-logo"></div>
-            <span>InternHub</span>
-          </div>
-          <nav class="nav-links">
-            <a href="./student-dashboard.html" class="nav-link">Dashboard</a>
-            <a href="./internship-recs.html" class="nav-link">Recommendations</a>
-            <a href="./progress-tracker.html" class="nav-link">Progress</a>
-            <a href="./chatbot.html" class="nav-link">Chatbot</a>
-          </nav>
+            <div class="nav-brand">
+                <div class="nav-logo"></div>
+                <span>InternHub</span>
+            </div>
+            <nav class="nav-links">
+                <a href="./student-dashboard.html" class="nav-link nav-link--active">Dashboard</a>
+                <a href="./student-recommendations.html" class="nav-link">Recommendations</a>
+                <a href="./student-progress.html" class="nav-link">Progress</a>
+                <a href="./student-profile.html" class="nav-link">Profile</a>
+                <a href="./chatbot.html" class="nav-link">Chatbot</a>
+                <a href="./login.html" class="nav-link">Logout</a>
+            </nav>
         </div>
-      </header>
+    </header>
 
-      <main class="main">
-        <div class="dashboard-layout">
-          <!-- SIDEBAR -->
-          <aside class="sidebar">
-            <div class="sidebar-title">Student</div>
-            <a
-              href="./student-dashboard.html"
-              class="sidebar-link sidebar-link--active"
-              >Dashboard</a
-            >
-            <a href="./internship-recs.html" class="sidebar-link"
-              >Recommendations</a
-            >
-            <a href="./progress-tracker.html" class="sidebar-link">Progress</a>
-            <a href="./chatbot.html" class="sidebar-link">Chatbot</a>
-            <a href="./login.html" class="sidebar-link">Logout</a>
-          </aside>
 
-          <!-- MAIN CONTENT -->
-          <section class="card" style="display: flex; flex-direction: column; gap: 1.25rem;">
-            <div class="card-header">
-              <div>
-                <div class="card-title">Dashboard Overview</div>
-                <div class="card-subtitle">
-                  Summary of your internship journey
+    <!-- ===== MAIN DASHBOARD CONTENT (missing earlier!!) ===== -->
+    <main class="main">
+      <section class="section">
+
+            <!-- overview box -->
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Dashboard Overview</div>
+                        <div class="card-subtitle">Summary of your internship journey</div>
+                    </div>
                 </div>
-              </div>
-            </div>
 
-            <!-- STATS CARDS -->
-            <div class="stats-grid" id="statsGrid">
-              <div class="stat-card">
-                <div class="stat-label">Applications</div>
-                <div class="stat-value" id="statApplications">2</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-label">Accepted</div>
-                <div class="stat-value" id="statAccepted">1</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-label">Pending</div>
-                <div class="stat-value" id="statPending">1</div>
-              </div>
-            </div>
+                <!-- Stats -->
+                <div class="stats-grid" style="margin-top:16px;">
+                    <div class="stat-card">
+                        <div class="stat-label">Applications</div>
+                        <div class="stat-value" id="count-apps">0</div>
+                    </div>
 
-            <!-- RECENT UPDATES -->
-            <div class="card" style="padding: 1rem;">
-              <div class="card-header" style="margin-bottom: 0.5rem;">
-                <div class="card-title" style="font-size: 0.95rem;">
-                  Recent Updates
+                    <div class="stat-card">
+                        <div class="stat-label">Accepted</div>
+                        <div class="stat-value" id="count-accepted">0</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-label">Pending</div>
+                        <div class="stat-value" id="count-pending">0</div>
+                    </div>
                 </div>
-              </div>
-              <ul
-                id="recentUpdates"
-                style="list-style: none; padding-left: 0; margin: 0; font-size: 0.85rem;"
-              >
-                <li>- Mentor feedback received on your last submission</li>
-                <li>- Milestone “Resume Submission” marked as completed</li>
-              </ul>
             </div>
-          </section>
-        </div>
-      </main>
 
-      <footer class="footer">
-        Student Dashboard · Applications · Feedback · Progress
-      </footer>
-    </div>
+            <!-- updates -->
+            <div class="card" style="margin-top:1.5rem;">
+                <div class="card-title">Recent Updates</div>
+                <p id="recent-list" style="margin-top:8px;">Loading...</p>
+            </div>
 
-    <script src="./assets/js/main.js"></script>
-    <script src="./assets/js/api.js"></script>
-    <script src="./assets/js/student-dashboard.js"></script>
-  </body>
-  <script>
-  if (!localStorage.getItem("access_token")) {
-    window.location.href = "./login.html";
-  }
-</script>
+      </section>
+    </main>
 
+
+    <footer class="footer">
+        Student Dashboard • Live stats • Last activity
+    </footer>
+
+</div>
+
+<script type="module" src="./assets/js/student-dashboard.js"></script>
+</body>
 </html>

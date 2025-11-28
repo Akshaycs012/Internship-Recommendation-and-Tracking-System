@@ -1,4 +1,4 @@
-// frontend/assets/js/internship-recs.js
+// frontend/assets/js/student-recommendations.js
 import { apiRequest } from "./api.js";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -11,13 +11,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Initial load (uses student.skills from backend if skills field is empty)
+  // initial load: uses student's profile skills when skills field is empty
   loadRecommendations();
 });
 
 async function loadRecommendations() {
-  const keywords = document.getElementById("searchKeywords")?.value || "";
-  const skills = document.getElementById("searchSkills")?.value || "";
+  const keywordsInput = document.getElementById("searchKeywords");
+  const skillsInput = document.getElementById("searchSkills");
+
+  const keywords = keywordsInput?.value || "";
+  const skills = skillsInput?.value || "";
 
   const params = new URLSearchParams();
   if (keywords) params.append("keywords", keywords);
@@ -35,17 +38,14 @@ async function loadRecommendations() {
 }
 
 function renderRecommendations(list) {
-  const container = document.getElementById("recsContainer");
+  const container = document.getElementById("recsList");
   if (!container) return;
 
   container.innerHTML = "";
 
-  if (!list.length) {
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML =
+  if (!list || !list.length) {
+    container.innerHTML =
       '<p style="font-size:0.9rem; color:var(--text-muted);">No internships found. Try changing filters or ask admin to add internships.</p>';
-    container.appendChild(card);
     return;
   }
 
@@ -100,7 +100,6 @@ function wireApplyButtons(container) {
           method: "POST",
         });
 
-        // After apply → mark button as Applied and disable
         btn.textContent = "Applied";
         btn.disabled = true;
         btn.classList.add("btn-ghost");

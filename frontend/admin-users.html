@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Manage Users – InternHub</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+<script src="/static/js/api.js"></script>
+<script src="/static/js/main.js"></script>
+
+
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="navbar">
+        <div class="navbar-inner">
+          <div class="nav-brand">
+            <div class="nav-logo"></div>
+            <span>InternHub</span>
+          </div>
+          <nav class="nav-links">
+            <a href="./admin-panel.html" class="nav-link">Dashboard</a>
+            <a href="./admin-users.html" class="nav-link nav-link--active"
+              >Manage Users</a
+            >
+            <a href="./admin-internships.html" class="nav-link"
+              >Manage Internships</a
+            >
+            <a href="./admin-logs.html" class="nav-link">Logs</a>
+            <a href="./login.html" class="nav-link">Logout</a>
+          </nav>
+        </div>
+      </header>
+
+      <main class="main">
+        <section class="section">
+          <div class="grid-2">
+            <!-- Users list -->
+            <div class="card">
+              <div class="card-title">Accepted Interns</div>
+              <table
+                class="table"
+                style="margin-top: 0.75rem; font-size: 0.8rem;"
+              >
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Internship</th>
+                    <th>Company</th>
+                    <th>Skills</th>
+                  </tr>
+                </thead>
+                <tbody id="acceptedUsersBody">
+                  <!-- JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Detail panel -->
+            <div class="card">
+              <div class="card-title">User Details</div>
+              <div
+                id="userDetailsContent"
+                style="margin-top: 0.75rem; font-size: 0.85rem;"
+              >
+                Select an intern from the list to view details.
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        Manage Users · Accepted interns and their progress
+      </footer>
+    </div>
+
+    <script src="/static/js/api.js"></script>
+<script src="/static/js/main.js"></script>
+<script type="module" src="/static/js/admin-panel.js"></script>
+
+
+    <script>
+      if (!localStorage.getItem("access_token")) {
+        window.location.href = "./login.html";
+      }
+    </script>
+  </body>
+</html>

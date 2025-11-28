@@ -3,7 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <title>Internship Recommendations – InternHub</title>
-    <link rel="stylesheet" href="./assets/css/styles.css" />
+    <link rel="stylesheet" href="/static/css/styles.css">
+<script src="/static/js/api.js"></script>
+<script src="/static/js/main.js"></script>
+
+
+
   </head>
   <body>
     <div class="app-shell">
@@ -13,12 +18,14 @@
             <div class="nav-logo"></div>
             <span>InternHub</span>
           </div>
-          <nav class="nav-links">
+                    <nav class="nav-links">
             <a href="./student-dashboard.html" class="nav-link">Dashboard</a>
             <a href="./internship-recs.html" class="nav-link">Recommendations</a>
             <a href="./progress-tracker.html" class="nav-link">Progress</a>
+            <a href="./student-profile.html" class="nav-link">Profile</a>
             <a href="./chatbot.html" class="nav-link">Chatbot</a>
           </nav>
+
         </div>
       </header>
 
@@ -107,14 +114,13 @@
       </footer>
     </div>
 
-    <script src="./assets/js/main.js"></script>
+       <script src="./assets/js/main.js"></script>
     <script src="./assets/js/api.js"></script>
-    <script src="./assets/js/internship-recs.js"></script>
+    <script type="module" src="./assets/js/internship-recs.js"></script>
   </body>
   <script>
-  if (!localStorage.getItem("access_token")) {
-    window.location.href = "./login.html";
-  }
-</script>
-
+    if (!localStorage.getItem("access_token")) {
+      window.location.href = "./login.html";
+    }
+  </script>
 </html>

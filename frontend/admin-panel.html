@@ -1,115 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <title>Admin Panel – InternHub</title>
-    <link rel="stylesheet" href="./assets/css/styles.css" />
-  </head>
-  <body>
-    <div class="app-shell">
-      <header class="navbar">
+
+    <!-- Correct CSS File Location -->
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+
+<body>
+<div class="app-shell">
+
+    <header class="navbar">
         <div class="navbar-inner">
-          <div class="nav-brand">
-            <div class="nav-logo"></div>
-            <span>InternHub</span>
-          </div>
-          <nav class="nav-links">
-            <a href="./admin-panel.html" class="nav-link">Admin Panel</a>
-            <a href="./login.html" class="nav-link">Logout</a>
-          </nav>
+            <div class="nav-brand">
+                <div class="nav-logo"></div><span>InternHub</span>
+            </div>
+            <nav class="nav-links">
+                <a href="./admin-panel.html" class="nav-link nav-link--active">Dashboard</a>
+                <a href="./admin-users.html" class="nav-link">Manage Users</a>
+                <a href="./admin-internships.html" class="nav-link">Manage Internships</a>
+                <a href="./admin-logs.html" class="nav-link">Logs</a>
+                <a href="./login.html" class="nav-link">Logout</a>
+            </nav>
         </div>
-      </header>
+    </header>
 
-      <main class="main">
+
+    <main class="main">
         <section class="section">
-          <div class="card" style="margin-bottom: 1.5rem;">
-            <div class="card-title">Admin Controls</div>
-            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem;">
-              <button class="btn btn-ghost" type="button">Manage Users</button>
-              <button class="btn btn-ghost" type="button">
-                Manage Internships
-              </button>
-              <button class="btn btn-ghost" type="button">Logs</button>
-            </div>
-          </div>
 
-          <div class="grid-2">
-            <!-- Add internship form -->
-            <div class="card">
-              <div class="card-title">Add Internship</div>
-              <form id="addInternshipForm" class="form-grid" style="margin-top: 0.75rem;">
-                <div class="form-group">
-                  <label class="label" for="intTitle">Title</label>
-                  <input class="input" id="intTitle" required />
+            <div class="card" style="margin-bottom:1.5rem;">
+                <div class="card-title">Admin Controls</div>
+                <div style="display:flex;gap:8px;margin-top:8px;">
+                    <a href="./admin-users.html" class="btn btn-ghost">Manage Users</a>
+                    <a href="./admin-internships.html" class="btn btn-ghost">Manage Internships</a>
+                    <a href="./admin-logs.html" class="btn btn-ghost">Logs</a>
+                    <button class="btn btn-ghost" onclick="location.href='admin-performance.html'">Performance Analytics</button>
                 </div>
-                <div class="form-group">
-                  <label class="label" for="intCompany">Company</label>
-                  <input class="input" id="intCompany" required />
-                </div>
-                <div class="form-group">
-                  <label class="label" for="intLocation">Location</label>
-                  <input class="input" id="intLocation" />
-                </div>
-                <div class="form-group">
-                  <label class="label" for="intSkills">Required Skills</label>
-                  <input
-                    class="input"
-                    id="intSkills"
-                    placeholder="e.g. Python, SQL"
-                  />
-                </div>
-                <div class="form-group">
-                  <label class="label" for="intIndustry">Industry</label>
-                  <input class="input" id="intIndustry" />
-                </div>
-                <button class="btn btn-primary" type="submit">
-                  Add Internship
-                </button>
-              </form>
             </div>
 
-            <!-- View applications -->
-            <div class="card">
-              <div class="card-title">Applications</div>
-              <table class="table" style="margin-top: 0.75rem; font-size: 0.8rem;">
-                <thead>
-                  <tr>
-                    <th>Student</th>
-                    <th>Internship</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody id="adminApplicationsBody">
-                  <tr>
-                    <td>Student A</td>
-                    <td>Software Engineering Intern</td>
-                    <td><span class="badge badge-success">Accepted</span></td>
-                  </tr>
-                  <tr>
-                    <td>Student B</td>
-                    <td>Frontend Intern</td>
-                    <td><span class="badge badge-warning">Pending</span></td>
-                  </tr>
-                </tbody>
-              </table>
+
+            <div class="grid-2">
+
+                <!-- ADD INTERNSHIP FORM -->
+                <div class="card">
+                    <div class="card-title">Add Internship</div>
+
+                    <form id="addInternshipForm" class="form-grid" style="margin-top:10px;">
+                        <div class="form-group"><label>Title</label><input id="intTitle" class="input" required></div>
+                        <div class="form-group"><label>Company</label><input id="intCompany" class="input" required></div>
+                        <div class="form-group"><label>Location</label><input id="intLocation" class="input"></div>
+                        <div class="form-group"><label>Skills</label><input id="intSkills" class="input" placeholder="Python, SQL"></div>
+                        <div class="form-group"><label>Industry</label><input id="intIndustry" class="input"></div>
+                        
+                        <button class="btn btn-primary" type="submit">Add Internship</button>
+                    </form>
+                </div>
+
+
+                <!-- APPLICATIONS TABLE -->
+                <div class="card">
+                    <div class="card-title">Applications</div>
+
+                    <table class="table" style="margin-top:8px;font-size:.85rem;">
+                        <thead>
+                            <tr><th>Student</th><th>Internship</th><th>Status</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody id="adminApplicationsBody"></tbody>
+                    </table>
+                </div>
+
             </div>
-          </div>
+
         </section>
-      </main>
+    </main>
 
-      <footer class="footer">
-        Admin Panel · Manage users, internships, and system logs
-      </footer>
-    </div>
+    <footer class="footer">Admin Panel · Create internships and manage applications</footer>
+</div>
 
-    <script src="./assets/js/main.js"></script>
-    <script src="./assets/js/api.js"></script>
-    <script src="./assets/js/admin-panel.js"></script>
-  </body>
-  <script>
-  if (!localStorage.getItem("access_token")) {
-    window.location.href = "./login.html";
-  }
+
+<!-- Load scripts in correct order -->
+<script src="/static/js/api.js"></script>
+<script src="/static/js/main.js"></script>
+<script type="module" src="/static/js/admin-panel.js"></script>
+
+
+<script>
+ if (!localStorage.getItem("access_token")) {
+     window.location.href = "./login.html";
+ }
 </script>
 
+
+</body>
 </html>
