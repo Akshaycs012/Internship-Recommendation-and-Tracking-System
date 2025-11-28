@@ -144,3 +144,83 @@ def reject(
     app.status = "rejected"
     db.commit()
     return {"message": "Rejected"}
+
+
+@router.get("/internships/{internship_id}/applicants")
+def get_internship_applicants(internship_id: int, db: Session = Depends(get_db), admin=Depends(require_admin)):
+
+    apps = (
+        db.query(models.Application, models.User, models.Student)
+        .join(models.Student, models.Application.student_id == models.Student.id)
+        .join(models.User, models.Student.user_id == models.User.id)
+        .filter(models.Application.internship_id == internship_id)
+        .all()
+    )
+
+    return [
+        {
+            "application_id": a.Application.id,
+            "name": a.User.full_name,
+            "email": a.User.email,
+            "resume": None,  # later we add upload
+            "status": a.Application.status,
+        }
+        for a in apps
+    ]
+
+
+# =================== VIEW APPLICANTS FOR SPECIFIC INTERNSHIP ===================
+
+@router.get("/internships/{intern_id}/applicants")
+def view_applicants(intern_id: int, db: Session = Depends(get_db), admin=Depends(require_admin)):
+    """
+    Returns list of all applicants for a specific internship.
+    Includes: student name, email, resume, status, application_id
+    """
+
+    data = (
+        db.query(models.Application, models.User, models.Student)
+        .join(models.Student, models.Application.student_id == models.Student.id)
+        .join(models.User, models.Student.user_id == models.User.id)
+        .filter(models.Application.internship_id == intern_id)
+        .all()
+    )
+
+    if not data:
+        return []
+
+    result = []
+    for a, user, student in data:
+        result.append({
+            "application_id": a.id,
+            "name": user.full_name,
+            "email": user.email,
+            "resume": None,  # will replace later when resume upload endpoint added
+            "status": a.status,
+        })
+
+    return result
+
+
+# =================== APPROVE / REJECT FROM APPLICANT TABLE ===================
+
+@router.patch("/applications/{application_id}/approve")
+def approve_applicant(application_id: int, db: Session = Depends(get_db), admin=Depends(require_admin)):
+    app = db.query(models.Application).filter_by(id=application_id).first()
+    if not app:
+        raise HTTPException(status_code=404, detail="Application not found")
+
+    app.status = "approved"
+    db.commit()
+    return {"message": "Student Approved"}
+
+
+@router.patch("/applications/{application_id}/reject")
+def reject_applicant(application_id: int, db: Session = Depends(get_db), admin=Depends(require_admin)):
+    app = db.query(models.Application).filter_by(id=application_id).first()
+    if not app:
+        raise HTTPException(status_code=404, detail="Application not found")
+
+    app.status = "rejected"
+    db.commit()
+    return {"message": "Student Rejected"}
