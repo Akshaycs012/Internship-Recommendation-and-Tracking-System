@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>My Tasks – InternHub</title>
+    <link rel="stylesheet" href="/static/css/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <!-- NAVBAR -->
+      <header class="navbar">
+        <div class="navbar-inner">
+          <div class="nav-brand">
+            <div class="nav-logo"></div>
+            <span>InternHub</span>
+          </div>
+          <nav class="nav-links">
+            <a href="./student-dashboard.html" class="nav-link">Dashboard</a>
+            <a href="./student-recommendations.html" class="nav-link"
+              >Recommendations</a
+            >
+            <a href="./student-tasks.html" class="nav-link nav-link--active"
+              >Tasks</a
+            >
+            <a href="./student-profile.html" class="nav-link">Profile</a>
+            <a href="./chatbot.html" class="nav-link">Chatbot</a>
+            <a href="./login.html" class="nav-link">Logout</a>
+          </nav>
+        </div>
+      </header>
+
+      <!-- MAIN -->
+      <main class="main">
+        <section class="section">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">My Internship Tasks</div>
+                <div class="card-subtitle">
+                  Tasks are shown for internships where your application is
+                  approved.
+                </div>
+              </div>
+            </div>
+
+            <table class="table" style="margin-top: 0.75rem">
+              <thead>
+                <tr>
+                  <th>Task</th>
+                  <th>Internship</th>
+                  <th>Due</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="studentTasksBody">
+                <tr>
+                  <td colspan="5" style="color: var(--text-muted)">
+                    Loading tasks...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        Student · View assigned tasks and submit your work
+      </footer>
+    </div>
+
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/main.js"></script>
+    <script type="module" src="/static/js/student-tasks.js"></script>
+
+    <script>
+      if (!localStorage.getItem("access_token")) {
+        window.location.href = "./login.html";
+      }
+    </script>
+  </body>
+</html>

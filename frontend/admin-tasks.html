@@ -3,12 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <title>Admin – Assign Tasks</title>
-  <link rel="stylesheet" href="/static/css/styles.css">
-<script src="/static/js/api.js"></script>
-<script src="/static/js/main.js"></script>
-
-
-
+    <link rel="stylesheet" href="/static/css/styles.css" />
   </head>
   <body>
     <div class="app-shell">
@@ -20,7 +15,9 @@
           </div>
           <nav class="nav-links">
             <a href="./admin-panel.html" class="nav-link">Admin Panel</a>
-            <a href="./admin-tasks.html" class="nav-link">Assign Tasks</a>
+            <a href="./admin-tasks.html" class="nav-link nav-link--active"
+              >Assign Tasks</a
+            >
             <a href="./login.html" class="nav-link">Logout</a>
           </nav>
         </div>
@@ -28,68 +25,119 @@
 
       <main class="main">
         <section class="section">
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">Assign Work / Learning Tasks</div>
-              <div class="card-subtitle">
-                Select an accepted student and create tasks for their internship.
+          <div class="grid-2">
+            <!-- ============== TASK CREATION FORM ============== -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">Assign Work / Learning Tasks</div>
+                <div class="card-subtitle">
+                  Select an approved student and create tasks for their
+                  internship.
+                </div>
               </div>
+
+              <form
+                id="taskForm"
+                class="form-grid"
+                style="margin-top: 0.75rem"
+              >
+                <div class="form-group">
+                  <label class="label" for="taskStudent">Student</label>
+                  <select id="taskStudent" class="select"></select>
+                </div>
+
+                <div class="form-group">
+                  <label class="label" for="taskInternship">Internship</label>
+                  <select id="taskInternship" class="select"></select>
+                </div>
+
+                <div class="form-group">
+                  <label class="label" for="taskTitle">Task title</label>
+                  <input
+                    id="taskTitle"
+                    class="input"
+                    placeholder="e.g. Build login page"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label class="label" for="taskDescription">Description</label>
+                  <textarea
+                    id="taskDescription"
+                    class="textarea"
+                    placeholder="Explain what the student should do / what they will learn."
+                  ></textarea>
+                </div>
+
+                <div class="form-group">
+                  <label class="label" for="taskAssignedDate"
+                    >Assigned date</label
+                  >
+                  <input
+                    id="taskAssignedDate"
+                    class="input"
+                    type="date"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label class="label" for="taskDueDate">Due date</label>
+                  <input id="taskDueDate" class="input" type="date" />
+                </div>
+
+                <button class="btn btn-primary" type="submit">
+                  Create Task
+                </button>
+              </form>
             </div>
 
-            <form id="taskForm" class="form-grid" style="margin-top: 0.75rem;">
-              <div class="form-group">
-                <label class="label" for="taskStudent">Student</label>
-                <select id="taskStudent" class="select"></select>
+            <!-- ============== STUDENT TASKS & SUBMISSIONS ============== -->
+            <div class="card" style="margin-top: 0">
+              <div class="card-header">
+                <div class="card-title">Student Tasks &amp; Submissions</div>
+                <div class="card-subtitle">
+                  Choose a student on the left to view their tasks and latest
+                  submissions.
+                </div>
               </div>
 
-              <div class="form-group">
-                <label class="label" for="taskInternship">Internship</label>
-                <select id="taskInternship" class="select"></select>
-              </div>
-
-              <div class="form-group">
-                <label class="label" for="taskTitle">Task title</label>
-                <input id="taskTitle" class="input" placeholder="e.g. Build login page" />
-              </div>
-
-              <div class="form-group">
-                <label class="label" for="taskDescription">Description</label>
-                <textarea
-                  id="taskDescription"
-                  class="textarea"
-                  placeholder="Explain what the student should do / what they will learn."
-                ></textarea>
-              </div>
-
-              <div class="form-group">
-                <label class="label" for="taskAssignedDate">Assigned date</label>
-                <input id="taskAssignedDate" class="input" type="date" />
-              </div>
-
-              <div class="form-group">
-                <label class="label" for="taskDueDate">Due date</label>
-                <input id="taskDueDate" class="input" type="date" />
-              </div>
-
-              <button class="btn btn-primary" type="submit">Create Task</button>
-            </form>
+              <table class="table" style="margin-top: 0.75rem">
+                <thead>
+                  <tr>
+                    <th>Task</th>
+                    <th>Internship</th>
+                    <th>Due</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="tasksTableBody">
+                  <tr>
+                    <td colspan="5" style="color: var(--text-muted)">
+                      Select a student on the left.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </section>
       </main>
 
       <footer class="footer">
-        Admin · Assign internship work and learning tasks
+        Admin · Assign internship work and review submissions
       </footer>
     </div>
 
+    <!-- Correct JS loading order -->
     <script src="/static/js/api.js"></script>
-<script src="/static/js/main.js"></script>
-<script type="module" src="/static/js/admin-panel.js"></script>
+    <script src="/static/js/main.js"></script>
+    <script type="module" src="/static/js/admin-tasks.js"></script>
 
+    <script>
+      if (!localStorage.getItem("access_token")) {
+        window.location.href = "./login.html";
+      }
+    </script>
   </body>
-  <script>
-    if (!localStorage.getItem("access_token")) {
-      window.location.href = "./login.html";
-    }
-  </script>
 </html>

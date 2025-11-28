@@ -42,6 +42,8 @@ class Student(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), unique=True)
     skills = Column(String, default="")  # comma separated skills "python,react"
+    # NEW: store latest uploaded resume URL/path so admin can open it
+    resume_path = Column(String, default=None)
 
     user = relationship("User", back_populates="student")
 
@@ -110,7 +112,7 @@ class Application(Base):
     id = Column(Integer, primary_key=True, index=True)
     student_id = Column(Integer, ForeignKey("students.id"))
     internship_id = Column(Integer, ForeignKey("internships.id"))
-    status = Column(String, default="pending")  # applied/approved/rejected
+    status = Column(String, default="pending")  # pending/approved/rejected
 
     student = relationship("Student", back_populates="applications")
     internship = relationship("Internship", back_populates="applications")

@@ -19,8 +19,13 @@ class InternshipCreate(BaseModel):
     skills: str | None = None
     industry: str | None = None
 
+
 @router.post("/internships")
-def add_internship(data: InternshipCreate, db: Session = Depends(get_db), admin=Depends(require_admin)):
+def add_internship(
+    data: InternshipCreate,
+    db: Session = Depends(get_db),
+    admin=Depends(require_admin),
+):
     internship = models.Internship(
         title=data.title,
         company=data.company,
@@ -35,16 +40,20 @@ def add_internship(data: InternshipCreate, db: Session = Depends(get_db), admin=
 
 
 @router.get("/internships")
-def list_internships(db: Session = Depends(get_db), admin=Depends(require_admin)):
+def list_internships(
+    db: Session = Depends(get_db),
+    admin=Depends(require_admin),
+):
     return db.query(models.Internship).all()
-
 
 
 # =================== APPLICATIONS - LIST FOR ADMIN PANEL ===================
 
 @router.get("/applications")
-def admin_all_applications(db: Session = Depends(get_db), admin=Depends(require_admin)):
-
+def admin_all_applications(
+    db: Session = Depends(get_db),
+    admin=Depends(require_admin),
+):
     apps = (
         db.query(models.Application, models.User, models.Internship)
         .join(models.Student, models.Application.student_id == models.Student.id)
@@ -67,25 +76,42 @@ def admin_all_applications(db: Session = Depends(get_db), admin=Depends(require_
 # =================== APPLICATIONS - FILTER VIEW PAGE ===================
 
 @router.get("/internships/{intern_id}/applications")
-def admin_internship_applications(intern_id:int, status:str|None=None,
-                                  db:Session=Depends(get_db), admin=Depends(require_admin)):
+def admin_internship_applications(
+    intern_id: int,
+    status: str | None = None,
+    db: Session = Depends(get_db),
+    admin=Depends(require_admin),
+):
+    """
+    Applications for a specific internship (used by admin-internships page).
+    Now also returns resume_url so admin can open the PDF in browser.
+    """
+    q = (
+        db.query(models.Application)
+        .filter(models.Application.internship_id == intern_id)
+    )
 
-    q = db.query(models.Application)\
-          .filter(models.Application.internship_id==intern_id)
+    if status in ("pending", "approved", "rejected"):
+        q = q.filter(models.Application.status == status)
 
-    if status in ("pending","approved","rejected"):
-        q = q.filter(models.Application.status==status)
-
-    result=[]
+    result = []
     for a in q.all():
-        student=db.query(models.User).join(models.Student)\
-                .filter(models.Student.id==a.student_id).first()
-        result.append({
-            "id": a.id,
-            "student": student.full_name,
-            "email": student.email,
-            "status": a.status
-        })
+        student_obj = db.query(models.Student).filter_by(id=a.student_id).first()
+        if not student_obj:
+            # should not happen, but skip invalid records instead of crashing UI
+            continue
+        user = student_obj.user
+
+        result.append(
+            {
+                "id": a.id,
+                "student": user.full_name,
+                "email": user.email,
+                "status": a.status,
+                # NEW: url for View Resume button
+                "resume_url": student_obj.resume_path,
+            }
+        )
 
     return result
 
@@ -93,15 +119,28 @@ def admin_internship_applications(intern_id:int, status:str|None=None,
 # =================== APPROVE & REJECT ===================
 
 @router.patch("/applications/{app_id}/approve")
-def approve(app_id:int, db:Session=Depends(get_db), admin=Depends(require_admin)):
-    app=db.query(models.Application).filter_by(id=app_id).first()
-    if not app: raise HTTPException(404,"Not found")
-    app.status="approved"; db.commit()
-    return {"message":"Approved"}
+def approve(
+    app_id: int,
+    db: Session = Depends(get_db),
+    admin=Depends(require_admin),
+):
+    app = db.query(models.Application).filter_by(id=app_id).first()
+    if not app:
+        raise HTTPException(status_code=404, detail="Not found")
+    app.status = "approved"
+    db.commit()
+    return {"message": "Approved"}
+
 
 @router.patch("/applications/{app_id}/reject")
-def reject(app_id:int, db:Session=Depends(get_db), admin=Depends(require_admin)):
-    app=db.query(models.Application).filter_by(id=app_id).first()
-    if not app: raise HTTPException(404,"Not found")
-    app.status="rejected"; db.commit()
-    return {"message":"Rejected"}
+def reject(
+    app_id: int,
+    db: Session = Depends(get_db),
+    admin=Depends(require_admin),
+):
+    app = db.query(models.Application).filter_by(id=app_id).first()
+    if not app:
+        raise HTTPException(status_code=404, detail="Not found")
+    app.status = "rejected"
+    db.commit()
+    return {"message": "Rejected"}

@@ -1,66 +1,163 @@
+// static/js/admin-internships.js
+// Handles:
+//   - listing internships
+//   - when "View" clicked => load applications
+//   - filter by status
+//   - approve / reject
+//   - open resume PDF in new tab
 import { apiRequest } from "./api.js";
 
-let selected=null,filter="pending";
+let selectedInternshipId = null;
+let currentFilter = "pending";
 
-document.addEventListener("DOMContentLoaded",()=>loadInternships());
+// ================= LOAD INTERNSHIPS ==================
+document.addEventListener("DOMContentLoaded", () => {
+  loadInternships();
 
-async function loadInternships(){
-    const box=document.getElementById("internshipsBody");
-    box.innerHTML=`<tr><td colspan='4'>Loading...</td></tr>`;
-
-    const list=await apiRequest("/admin/internships");
-
-    if(!list.length) return box.innerHTML=`<tr><td colspan='4'>No Internships</td></tr>`;
-
-    box.innerHTML="";
-    list.forEach(x=>{
-        box.innerHTML+=`
-        <tr>
-            <td>${x.title}</td>
-            <td>${x.company}</td>
-            <td>${x.industry}</td>
-            <td><button class='btn btn-primary' onclick='select(${x.id})'>View</button></td>
-        </tr>`;
+  // wire filter buttons once
+  document.querySelectorAll("[data-filter]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      currentFilter = btn.dataset.filter;
+      // visual active state
+      document
+        .querySelectorAll("[data-filter]")
+        .forEach((b) => b.classList.remove("btn-primary"));
+      btn.classList.add("btn-primary");
+      loadApplications();
     });
-}
-
-window.select=function(id){
-    selected=id;
-    loadApps();
-}
-
-async function loadApps(){
-    const box=document.getElementById("appsBody");
-    if(!selected) return box.innerHTML=`<tr><td colspan='4'>Select Internship First</td></tr>`;
-
-    let url=`/admin/internships/${selected}/applications`;
-    if(filter!=="all") url+=`?status=${filter}`;
-
-    const apps=await apiRequest(url);
-
-    if(!apps.length) return box.innerHTML=`<tr><td colspan='4'>No Applications Found</td></tr>`;
-
-    box.innerHTML="";
-    apps.forEach(x=>{
-        box.innerHTML+=`
-        <tr>
-            <td>${x.student}</td>
-            <td>${x.email}</td>
-            <td>${x.status}</td>
-            <td>
-                <button onclick='update(${x.id},"approve")' class='btn btn-success'>Approve</button>
-                <button onclick='update(${x.id},"reject")' class='btn btn-danger'>Reject</button>
-            </td>
-        </tr>`;
-    });
-}
-
-window.update=async(id,type)=>{
-    await apiRequest(`/admin/applications/${id}/${type}`,{method:"PATCH"});
-    loadApps();
-}
-
-document.querySelectorAll("[data-filter]").forEach(b=>b.onclick=()=>{
-    filter=b.dataset.filter;
-    loadApps();
+  });
 });
+
+async function loadInternships() {
+  const tbody = document.getElementById("internshipsBody");
+  tbody.innerHTML =
+    '<tr><td colspan="4" style="color:var(--text-muted);">Loading...</td></tr>';
+
+  try {
+    const data = await apiRequest("/admin/internships");
+
+    if (!data.length) {
+      tbody.innerHTML =
+        '<tr><td colspan="4" style="color:var(--text-muted);">No internships created yet</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = "";
+    data.forEach((intern) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+            <td>${intern.title}</td>
+            <td>${intern.company}</td>
+            <td>${intern.industry ?? "-"}</td>
+            <td><button class="btn btn-primary" data-id="${intern.id}">View</button></td>
+        `;
+      const btn = row.querySelector("button");
+      btn.onclick = () => selectInternship(intern.id);
+      tbody.appendChild(row);
+    });
+  } catch (err) {
+    console.error("Failed to load internships", err);
+    tbody.innerHTML =
+      '<tr><td colspan="4" style="color:red;">Failed to load internships</td></tr>';
+  }
+}
+
+// ================= SELECT INTERNSHIP ==================
+function selectInternship(id) {
+  selectedInternshipId = id;
+  loadApplications();
+}
+
+// ================= LOAD APPLICATIONS ==================
+async function loadApplications() {
+  const tbody = document.getElementById("appsBody");
+  if (!tbody) return;
+
+  if (!selectedInternshipId) {
+    tbody.innerHTML =
+      '<tr><td colspan="5" style="color:var(--text-muted);">Select internship first</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML =
+    '<tr><td colspan="5" style="color:var(--text-muted);">Loading...</td></tr>';
+
+  try {
+    let url = `/admin/internships/${selectedInternshipId}/applications`;
+    if (currentFilter !== "all") {
+      url += `?status=${currentFilter}`;
+    }
+
+    const apps = await apiRequest(url);
+
+    if (!apps.length) {
+      tbody.innerHTML =
+        '<tr><td colspan="5" style="color:var(--text-muted);">No applications found</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = "";
+    apps.forEach((a) => {
+      const row = document.createElement("tr");
+
+      // decide which buttons to show based on status
+      let actionsHtml = "";
+      if (a.status === "pending") {
+        actionsHtml = `
+          <button class="btn btn-primary btn-sm" data-approve="${a.id}">Approve</button>
+          <button class="btn btn-ghost btn-sm" data-reject="${a.id}">Reject</button>
+        `;
+      } else if (a.status === "approved") {
+        actionsHtml = `
+          <button class="btn btn-ghost btn-sm" data-reject="${a.id}">Mark Rejected</button>
+        `;
+      } else if (a.status === "rejected") {
+        actionsHtml = `
+          <button class="btn btn-primary btn-sm" data-approve="${a.id}">Re-Approve</button>
+        `;
+      }
+
+      const resumeHtml = a.resume_url
+        ? `<a href="${a.resume_url}" target="_blank" class="btn btn-ghost btn-sm">View</a>`
+        : `<span style="color:var(--text-muted);font-size:0.8rem;">No resume</span>`;
+
+      row.innerHTML = `
+        <td>${a.student}</td>
+        <td>${a.email}</td>
+        <td>${resumeHtml}</td>
+        <td>${a.status}</td>
+        <td>${actionsHtml}</td>
+      `;
+      tbody.appendChild(row);
+    });
+
+    bindStatusActions();
+  } catch (err) {
+    console.error("Failed to load applications", err);
+    tbody.innerHTML =
+      '<tr><td colspan="5" style="color:red;">Error loading applications</td></tr>';
+  }
+}
+
+// ================= UPDATE STATUS ==================
+function bindStatusActions() {
+  document.querySelectorAll("[data-approve]").forEach((btn) => {
+    btn.onclick = async () => {
+      const id = btn.dataset.approve;
+      await apiRequest(`/admin/applications/{id}/approve`.replace("{id}", id), {
+        method: "PATCH",
+      });
+      loadApplications();
+    };
+  });
+
+  document.querySelectorAll("[data-reject]").forEach((btn) => {
+    btn.onclick = async () => {
+      const id = btn.dataset.reject;
+      await apiRequest(`/admin/applications/{id}/reject`.replace("{id}", id), {
+        method: "PATCH",
+      });
+      loadApplications();
+    };
+  });
+}

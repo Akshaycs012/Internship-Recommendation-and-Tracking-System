@@ -117,8 +117,8 @@ def get_profile(
         "name": user.full_name,
         "email": user.email,
         "skills": student.skills or "",
-        # Resume URL is not persisted in DB yet
-        "resume_url": None,
+        # now we actually persist resume path in DB
+        "resume_url": student.resume_path,
     }
 
 
@@ -159,22 +159,43 @@ async def upload_resume(
     with open(dest_path, "wb") as f:
         f.write(content)
 
+    # Public URL served by FastAPI static mount
     file_url = f"/uploads/resumes/{safe_name}"
+
+    # NEW: keep latest resume location on student profile,
+    # so admin can open it from applications screen
+    student.resume_path = file_url
+    db.commit()
 
     return {
         "message": "Resume uploaded",
         "file_url": file_url,
     }
+
+
 @router.post("/apply/{internship_id}")
-def apply(internship_id:int, db:Session=Depends(get_db), user=Depends(get_current_user)):
+def apply(
+    internship_id: int,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+):
     student = db.query(models.Student).filter_by(user_id=user.id).first()
     if not student:
-        student=models.Student(user_id=user.id); db.add(student); db.commit(); db.refresh(student)
+        student = models.Student(user_id=user.id)
+        db.add(student)
+        db.commit()
+        db.refresh(student)
 
-    existing = db.query(models.Application).filter_by(student_id=student.id, internship_id=internship_id).first()
-    if existing: raise HTTPException(400,"Already applied")
+    existing = db.query(models.Application).filter_by(
+        student_id=student.id, internship_id=internship_id
+    ).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Already applied")
 
-    app=models.Application(student_id=student.id, internship_id=internship_id, status="pending")
-    db.add(app); db.commit()
+    app = models.Application(
+        student_id=student.id, internship_id=internship_id, status="pending"
+    )
+    db.add(app)
+    db.commit()
 
-    return {"message":"Application Submitted"}
+    return {"message": "Application Submitted"}

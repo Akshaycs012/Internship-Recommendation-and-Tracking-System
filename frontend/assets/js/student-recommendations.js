@@ -27,9 +27,7 @@ async function loadRecommendations() {
   if (skills) params.append("skills", skills);
 
   try {
-    const recs = await apiRequest(
-      `/internships/recommendations?${params.toString()}`
-    );
+    const recs = await apiRequest(`/internships/recommendations?${params.toString()}`, { method:"GET" });
     renderRecommendations(recs);
   } catch (err) {
     console.error("Failed to load recommendations", err);
