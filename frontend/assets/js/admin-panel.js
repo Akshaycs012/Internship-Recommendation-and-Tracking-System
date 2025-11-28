@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     loadApplications();
 });
 
+// ------------------- Internship Form -------------------
 function handleInternshipForm(){
     const form=document.getElementById("addInternshipForm");
     if(!form) return;
@@ -32,8 +33,7 @@ function handleInternshipForm(){
 }
 
 
-// ================ APPLICATIONS LOAD ================
-
+// ------------------- Load Application List -------------------
 async function loadApplications(){
     const tbody=document.getElementById("adminApplicationsBody");
     tbody.innerHTML=`<tr><td colspan="4">Loading...</td></tr>`;
@@ -63,6 +63,8 @@ async function loadApplications(){
     bindEvents();
 }
 
+
+// ------------------- Approve / Reject Buttons -------------------
 function bindEvents(){
     document.querySelectorAll("[data-approve]").forEach(b=>
         b.onclick=()=>update(b.dataset.approve,"approve"));
@@ -73,4 +75,38 @@ function bindEvents(){
 async function update(id,action){
     await apiRequest(`/admin/applications/${id}/${action}`,{method:"PATCH"});
     loadApplications();
+}
+
+
+// ------------------- NEW — LOAD APPLICANTS PER INTERNSHIP -------------------
+async function loadApplicants(internshipId) {
+    const tbody = document.querySelector("#applicationsTable tbody");
+    tbody.innerHTML = "<tr><td colspan='5'>Loading...</td></tr>";
+
+    try {
+        const res = await apiRequest(`/admin/internships/${internshipId}/applicants`);
+        if (!res.length) {
+            tbody.innerHTML = "<tr><td colspan='5'>No applications found</td></tr>";
+            return;
+        }
+
+        tbody.innerHTML = "";
+        res.forEach(a => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${a.name}</td>
+                <td>${a.email}</td>
+                <td><button class="btn btn-secondary">View PDF</button></td>
+                <td>${a.status}</td>
+                <td>
+                    <button class="btn btn-success" onclick="approve(${a.application_id})">Approve</button>
+                    <button class="btn btn-danger" onclick="reject(${a.application_id})">Reject</button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+
+    } catch(err) {
+        tbody.innerHTML = "<tr><td colspan='5'>Error loading data</td></tr>";
+    }
 }
