@@ -165,3 +165,16 @@ async def upload_resume(
         "message": "Resume uploaded",
         "file_url": file_url,
     }
+@router.post("/apply/{internship_id}")
+def apply(internship_id:int, db:Session=Depends(get_db), user=Depends(get_current_user)):
+    student = db.query(models.Student).filter_by(user_id=user.id).first()
+    if not student:
+        student=models.Student(user_id=user.id); db.add(student); db.commit(); db.refresh(student)
+
+    existing = db.query(models.Application).filter_by(student_id=student.id, internship_id=internship_id).first()
+    if existing: raise HTTPException(400,"Already applied")
+
+    app=models.Application(student_id=student.id, internship_id=internship_id, status="pending")
+    db.add(app); db.commit()
+
+    return {"message":"Application Submitted"}
