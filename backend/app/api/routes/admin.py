@@ -2,6 +2,7 @@ from datetime import date
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
+from datetime import datetime
 
 from app.api.deps import require_admin
 from app.db.database import get_db
@@ -202,25 +203,100 @@ def view_applicants(intern_id: int, db: Session = Depends(get_db), admin=Depends
     return result
 
 
-# =================== APPROVE / REJECT FROM APPLICANT TABLE ===================
+# =================== APPROVE / REJECT (FINAL CLEAN VERSION) ===================
 
-@router.patch("/applications/{application_id}/approve")
-def approve_applicant(application_id: int, db: Session = Depends(get_db), admin=Depends(require_admin)):
-    app = db.query(models.Application).filter_by(id=application_id).first()
+@router.patch("/applications/{app_id}/approve")
+def approve_application(app_id: int, db: Session = Depends(get_db), admin=Depends(require_admin)):
+    app = db.query(models.Application).filter_by(id=app_id).first()
     if not app:
-        raise HTTPException(status_code=404, detail="Application not found")
+        raise HTTPException(404, "Application not found")
 
     app.status = "approved"
+    app.progress_status = "active"
+    app.approved_at = datetime.utcnow()
+
+    db.add(models.ApplicationLog(
+        student_id=app.student_id,
+        internship_id=app.internship_id,
+        event="APPROVED",
+        message="Admin approved application"
+    ))
     db.commit()
-    return {"message": "Student Approved"}
+    return {"message": "Approved Successfully"}
 
 
-@router.patch("/applications/{application_id}/reject")
-def reject_applicant(application_id: int, db: Session = Depends(get_db), admin=Depends(require_admin)):
-    app = db.query(models.Application).filter_by(id=application_id).first()
+@router.patch("/applications/{app_id}/reject")
+def reject_application(app_id: int, db: Session = Depends(get_db), admin=Depends(require_admin)):
+    app = db.query(models.Application).filter_by(id=app_id).first()
     if not app:
-        raise HTTPException(status_code=404, detail="Application not found")
+        raise HTTPException(404, "Application not found")
 
     app.status = "rejected"
+    app.progress_status = "ended"
+
+    db.add(models.ApplicationLog(
+        student_id=app.student_id,
+        internship_id=app.internship_id,
+        event="REJECTED",
+        message="Admin rejected application"
+    ))
     db.commit()
-    return {"message": "Student Rejected"}
+    return {"message": "Rejected Successfully"}
+
+
+# =============== ADMIN ASSIGN TASK TO STUDENT ==================
+
+from pydantic import BaseModel
+
+class TaskAssign(BaseModel):
+    student_id:int
+    internship_id:int
+    title:str
+    description:str | None=None
+    due_date:str
+
+@router.post("/assign-task",dependencies=[Depends(require_admin)])
+def assign_task(payload:TaskAssign,db:Session=Depends(get_db)):
+    task=models.InternshipTask(
+        internship_id=payload.internship_id,
+        title=payload.title,
+        description=payload.description or "",
+        due_date=payload.due_date
+    )
+    db.add(task); db.commit(); db.refresh(task)
+
+    log=models.ApplicationLog(
+        student_id=payload.student_id,
+        internship_id=payload.internship_id,
+        event="TASK_ASSIGNED",
+        message=f"Assigned : {payload.title}"
+    )
+    db.add(log); db.commit()
+
+    return {"message":"Task Assigned","task_id":task.id}
+
+# ============ ADMIN REVIEW SUBMISSION =============
+
+@router.post("/review/{submission_id}",dependencies=[Depends(require_admin)])
+def review(submission_id:int,feedback:str,db:Session=Depends(get_db)):
+    sub=db.query(models.TaskSubmission).filter_by(id=submission_id).first()
+    if not sub: raise HTTPException(404,"No submission found")
+    sub.feedback=feedback
+    db.commit()
+    return {"message":"Reviewed"}
+
+
+@router.get("/users/accepted")
+def list_accepted_users(db: Session = Depends(get_db), admin=Depends(require_admin)):
+    apps = db.query(models.Application).filter_by(status="approved").all()
+    data = []
+    for a in apps:
+        st = a.student
+        data.append({
+            "user_id": st.user.id,
+            "name": st.user.full_name,
+            "internship": a.internship.title,
+            "company": a.internship.company,
+            "skills": st.skills
+        })
+    return data

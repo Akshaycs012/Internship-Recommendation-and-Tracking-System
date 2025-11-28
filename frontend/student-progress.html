@@ -1,14 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Progress – InternHub</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
-<script src="/static/js/api.js"></script>
-<script src="/static/js/main.js"></script>
+<html>
+<head>
+<title>Progress – InternHub</title>
+<link rel="stylesheet" href="/static/css/styles.css">
+<script type="module" src="/static/js/student-progress.js"></script>
+</head>
 
+<body>
+<header class="navbar">
+  <nav>
+    <a href="student-dashboard.html">Dashboard</a>
+    <a href="student-progress.html" class="nav-link--active">Progress</a>
+  </nav>
+</header>
 
-  </head>
+<main class="main section">
+
+<h2>My Internship Tasks</h2>
+<table class="table" id="taskTable">
+<tr><td>Loading...</td></tr>
+</table>
+
+</main>
+</body>
+</html>
+
   <body>
     <div class="app-shell">
       <!-- Top Navbar -->

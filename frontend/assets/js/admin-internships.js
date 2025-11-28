@@ -69,75 +69,37 @@ function selectInternship(id) {
 }
 
 // ================= LOAD APPLICATIONS ==================
-async function loadApplications() {
-  const tbody = document.getElementById("appsBody");
-  if (!tbody) return;
+async function loadApplicants(id){
+    const tbody=document.getElementById("internApps");
+    tbody.innerHTML=`<tr><td colspan=4>Loading...</td></tr>`;
 
-  if (!selectedInternshipId) {
-    tbody.innerHTML =
-      '<tr><td colspan="5" style="color:var(--text-muted);">Select internship first</td></tr>';
-    return;
-  }
+    const res=await apiRequest(`/admin/internships/${id}/applications`);
 
-  tbody.innerHTML =
-    '<tr><td colspan="5" style="color:var(--text-muted);">Loading...</td></tr>';
-
-  try {
-    let url = `/admin/internships/${selectedInternshipId}/applications`;
-    if (currentFilter !== "all") {
-      url += `?status=${currentFilter}`;
-    }
-
-    const apps = await apiRequest(url);
-
-    if (!apps.length) {
-      tbody.innerHTML =
-        '<tr><td colspan="5" style="color:var(--text-muted);">No applications found</td></tr>';
-      return;
-    }
-
-    tbody.innerHTML = "";
-    apps.forEach((a) => {
-      const row = document.createElement("tr");
-
-      // decide which buttons to show based on status
-      let actionsHtml = "";
-      if (a.status === "pending") {
-        actionsHtml = `
-          <button class="btn btn-primary btn-sm" data-approve="${a.id}">Approve</button>
-          <button class="btn btn-ghost btn-sm" data-reject="${a.id}">Reject</button>
-        `;
-      } else if (a.status === "approved") {
-        actionsHtml = `
-          <button class="btn btn-ghost btn-sm" data-reject="${a.id}">Mark Rejected</button>
-        `;
-      } else if (a.status === "rejected") {
-        actionsHtml = `
-          <button class="btn btn-primary btn-sm" data-approve="${a.id}">Re-Approve</button>
-        `;
-      }
-
-      const resumeHtml = a.resume_url
-        ? `<a href="${a.resume_url}" target="_blank" class="btn btn-ghost btn-sm">View</a>`
-        : `<span style="color:var(--text-muted);font-size:0.8rem;">No resume</span>`;
-
-      row.innerHTML = `
-        <td>${a.student}</td>
-        <td>${a.email}</td>
-        <td>${resumeHtml}</td>
-        <td>${a.status}</td>
-        <td>${actionsHtml}</td>
-      `;
-      tbody.appendChild(row);
-    });
-
-    bindStatusActions();
-  } catch (err) {
-    console.error("Failed to load applications", err);
-    tbody.innerHTML =
-      '<tr><td colspan="5" style="color:red;">Error loading applications</td></tr>';
-  }
+    tbody.innerHTML="";
+    res.forEach(s=>{
+        tbody.innerHTML+=`
+        <tr>
+            <td>${s.student}</td>
+            <td><a href="${s.resume_url}" target="_blank">View Resume</a></td>
+            <td>${s.status}</td>
+            <td>
+                <button onclick="approve(${s.id})" class="btn btn-success">Approve</button>
+                <button onclick="reject(${s.id})" class="btn btn-danger">Reject</button>
+            </td>
+        </tr>`;
+    })
 }
+
+async function approve(id){
+    await apiRequest(`/admin/applications/${id}/approve`, { method:"PATCH" });
+    loadInternships();
+}
+
+async function reject(id){
+    await apiRequest(`/admin/applications/${id}/reject`, { method:"PATCH" });
+    loadInternships();
+}
+
 
 // ================= UPDATE STATUS ==================
 function bindStatusActions() {
@@ -160,4 +122,10 @@ function bindStatusActions() {
       loadApplications();
     };
   });
+}
+
+
+async function viewTasks(id){
+    const tasks=await apiRequest(`/admin/internships/${id}/tasks`);
+    alert(JSON.stringify(tasks,null,2)); // later replace with UI modal
 }

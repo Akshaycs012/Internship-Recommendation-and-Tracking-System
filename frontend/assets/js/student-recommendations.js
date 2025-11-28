@@ -87,25 +87,44 @@ function renderRecommendations(list) {
   wireApplyButtons(container);
 }
 
-function wireApplyButtons(container) {
-  container.querySelectorAll("[data-apply]").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      const internshipId = btn.getAttribute("data-apply");
-      if (!internshipId) return;
+async function applyAction(id, btn) {
+    try {
+        await fetch(`/applications/apply/${id}`, {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("access_token"),
+                "Content-Type": "application/json"
+            }
+        }).then(r => r.json());
 
-      try {
-        await apiRequest(`/applications/apply/${internshipId}`, {
-          method: "POST",
-        });
+        btn.innerText = "Cancel";
+        btn.className = "btn btn-danger";
+        btn.onclick = () => cancelAction(id, btn);
 
-        btn.textContent = "Applied";
-        btn.disabled = true;
-        btn.classList.add("btn-ghost");
-        alert("Application submitted.");
-      } catch (err) {
-        console.error("Failed to apply", err);
-        alert("Could not apply – maybe you already applied?");
-      }
-    });
-  });
+    } catch (e) {
+        alert(e.message || "Failed to apply");
+    }
 }
+
+
+async function cancelAction(id, btn) {
+    await fetch(`/applications/cancel/${id}`, {
+        method: "DELETE",
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem("access_token"),
+            "Content-Type": "application/json"
+        }
+    });
+
+    btn.innerText = "Apply";
+    btn.className = "btn btn-primary";
+    btn.onclick = () => applyAction(id, btn);
+}
+
+
+function wireApplyButtons(container){
+    container.querySelectorAll("[data-apply]").forEach(b=>{
+        b.onclick=()=>applyAction(b.dataset.apply,b);
+    });
+}
+

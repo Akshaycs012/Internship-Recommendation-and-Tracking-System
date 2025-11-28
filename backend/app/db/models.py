@@ -41,9 +41,28 @@ class Student(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), unique=True)
+
+    # existing basic skills field (kept)
     skills = Column(String, default="")  # comma separated skills "python,react"
-    # NEW: store latest uploaded resume URL/path so admin can open it
-    resume_path = Column(String, default=None)
+
+    # -------- extended profile fields --------
+    # age OR date_of_birth – you can use one or both
+    age = Column(Integer, nullable=True)
+    date_of_birth = Column(Date, nullable=True)
+
+    phone = Column(String, nullable=True)         # mobile number
+    education = Column(String, nullable=True)     # degree / year
+    experience = Column(Text, nullable=True)      # previous experience, free text
+
+    linkedin_url = Column(String, nullable=True)
+    github_url = Column(String, nullable=True)
+    portfolio_url = Column(String, nullable=True)
+
+    # simple text for skill level, e.g. "Beginner / Intermediate / Advanced"
+    skills_rating = Column(String, default="")
+
+    # resume stored as URL/path so admin can download
+    resume_url = Column(String, nullable=True)
 
     user = relationship("User", back_populates="student")
 
@@ -112,7 +131,27 @@ class Application(Base):
     id = Column(Integer, primary_key=True, index=True)
     student_id = Column(Integer, ForeignKey("students.id"))
     internship_id = Column(Integer, ForeignKey("internships.id"))
-    status = Column(String, default="pending")  # pending/approved/rejected
+
+    # existing status – still used
+    # values: pending / approved / rejected
+    status = Column(String, default="pending")
+
+    # -------- extended lifecycle fields --------
+    # when student applied from recommendations
+    applied_at = Column(DateTime(timezone=True), server_default=func.now())
+    # when admin approved
+    approved_at = Column(DateTime(timezone=True), nullable=True)
+    # when internship finished/completed
+    completed_at = Column(DateTime(timezone=True), nullable=True)
+
+    # progress view: pending / active / completed
+    progress_status = Column(String, default="pending")
+
+    # store resume snapshot at the moment of application
+    resume_url = Column(String, default="")
+
+    # admin notes / comments
+    remarks_admin = Column(Text, default="")
 
     student = relationship("Student", back_populates="applications")
     internship = relationship("Internship", back_populates="applications")
@@ -166,3 +205,19 @@ class TaskSubmission(Base):
 
     task = relationship("InternshipTask", back_populates="submissions")
     student = relationship("Student")
+
+
+# ===================== APPLICATION LOG (for Logs page) ===================== #
+class ApplicationLog(Base):
+    __tablename__ = "application_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    application_id = Column(Integer, ForeignKey("applications.id"), nullable=True)
+    student_id = Column(Integer, ForeignKey("students.id"), nullable=True)
+    internship_id = Column(Integer, ForeignKey("internships.id"), nullable=True)
+
+    event = Column(String, nullable=False)  # applied/approved/rejected/cancelled/completed/created
+    message = Column(Text, default="")
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())

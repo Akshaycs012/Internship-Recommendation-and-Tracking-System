@@ -5,38 +5,24 @@ document.addEventListener("DOMContentLoaded", () => {
   loadAcceptedUsers();
 });
 
-async function loadAcceptedUsers() {
-  const tbody = document.getElementById("acceptedUsersBody");
-  tbody.innerHTML = "";
+async function loadAcceptedUsers(){
+    const tbody = document.getElementById("acceptedUsersBody");
+    tbody.innerHTML = "Loading...";
 
-  try {
     const users = await apiRequest("/admin/users/accepted");
+    tbody.innerHTML = "";
 
-    if (!users.length) {
-      const row = document.createElement("tr");
-      row.innerHTML =
-        '<td colspan="4" style="color: var(--text-muted);">No accepted interns yet</td>';
-      tbody.appendChild(row);
-      return;
-    }
-
-    users.forEach((u) => {
-      const row = document.createElement("tr");
-      row.style.cursor = "pointer";
-      row.addEventListener("click", () => loadUserDetails(u.user_id));
-
-      row.innerHTML = `
-        <td>${u.student_name}</td>
-        <td>${u.internship_title}</td>
-        <td>${u.company}</td>
-        <td>${u.skills}</td>
-      `;
-      tbody.appendChild(row);
+    users.forEach(u=>{
+        tbody.innerHTML += `
+        <tr>
+            <td>${u.name}</td>
+            <td>${u.internship}</td>
+            <td>${u.company}</td>
+            <td>${u.skills}</td>
+        </tr>`;
     });
-  } catch (err) {
-    console.error("Failed to load accepted users", err);
-  }
 }
+
 
 async function loadUserDetails(userId) {
   const panel = document.getElementById("userDetailsContent");

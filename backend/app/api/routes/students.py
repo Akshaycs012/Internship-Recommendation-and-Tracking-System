@@ -1,9 +1,8 @@
-# backend/app/api/routes/students.py
-
-from datetime import datetime
+from datetime import datetime, date
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
@@ -14,8 +13,11 @@ from app.core.paths import RESUME_DIR
 router = APIRouter(prefix="/students", tags=["students"])
 
 
+# ========================================================
+# INTERNAL — ENSURE STUDENT PROFILE EXISTS
+# ========================================================
 def _get_or_create_student(db: Session, user: models.User) -> models.Student:
-    student = db.query(models.Student).filter(models.Student.user_id == user.id).first()
+    student = db.query(models.Student).filter_by(user_id=user.id).first()
     if not student:
         student = models.Student(user_id=user.id, skills="")
         db.add(student)
@@ -24,178 +26,93 @@ def _get_or_create_student(db: Session, user: models.User) -> models.Student:
     return student
 
 
-@router.get("/me/summary")
-def get_student_summary(
-    db: Session = Depends(get_db),
-    user=Depends(get_current_user),
-):
-    """
-    Dashboard data:
-      - applications, accepted, pending counts
-      - recent_updates: last ~5 events (task submissions + approvals)
-    """
-    student = _get_or_create_student(db, user)
-
-    # All applications
-    applications = (
-        db.query(models.Application)
-        .filter(models.Application.student_id == student.id)
-        .all()
-    )
-
-    total = len(applications)
-    accepted = len([a for a in applications if a.status == "approved"])
-    pending = len(
-        [
-            a
-            for a in applications
-            if a.status in ("applied", "pending")
-        ]
-    )
-
-    # --------- RECENT UPDATES FEED ---------
-    events: list[tuple[datetime, str]] = []
-
-    # Task submissions
-    submissions = (
-        db.query(models.TaskSubmission)
-        .filter(models.TaskSubmission.student_id == student.id)
-        .order_by(models.TaskSubmission.submitted_at.desc())
-        .limit(5)
-        .all()
-    )
-    for sub in submissions:
-        task = (
-            db.query(models.InternshipTask)
-            .filter(models.InternshipTask.id == sub.task_id)
-            .first()
-        )
-        if not task:
-            continue
-
-        label = "On time ✓" if sub.status == "on_time" else "Submitted late ⚠"
-        msg = f'Task "{task.title}" submitted — {label}'
-        events.append((sub.submitted_at, msg))
-
-    # Application approvals / rejections
-    for app in applications:
-        internship = app.internship
-        if internship is None:
-            continue
-        # Use id as pseudo-time ordering if created_at is not available
-        when = datetime.fromtimestamp(app.id)
-        if app.status == "approved":
-            msg = f'Your application for "{internship.title}" was approved ✓'
-            events.append((when, msg))
-        elif app.status == "rejected":
-            msg = f'Your application for "{internship.title}" was rejected'
-            events.append((when, msg))
-
-    # Sort by timestamp descending and take latest 5
-    events.sort(key=lambda x: x[0], reverse=True)
-    recent_updates = [msg for _, msg in events[:5]]
-
-    return {
-        "applications": total,
-        "accepted": accepted,
-        "pending": pending,
-        "recent_updates": recent_updates,
-    }
+# ========================================================
+# PROFILE STRUCTURE
+# ========================================================
+class StudentProfileUpdate(BaseModel):
+    full_name: str | None = None
+    skills: str | None = None
+    age: int | None = None
+    date_of_birth: date | None = None
+    phone: str | None = None
+    education: str | None = None
+    experience: str | None = None
+    linkedin_url: str | None = None
+    github_url: str | None = None
+    portfolio_url: str | None = None
+    skills_rating: str | None = None
 
 
+# ========================================================
+# GET PROFILE — frontend uses this to load page
+# ========================================================
 @router.get("/me/profile")
-def get_profile(
-    db: Session = Depends(get_db),
-    user=Depends(get_current_user),
-):
-    """
-    Basic profile data for student profile page.
-    """
+def get_profile(db: Session = Depends(get_db), user=Depends(get_current_user)):
     student = _get_or_create_student(db, user)
+
+    profile_complete = bool(student.phone and student.education and student.resume_url)
 
     return {
         "name": user.full_name,
         "email": user.email,
         "skills": student.skills or "",
-        # now we actually persist resume path in DB
-        "resume_url": student.resume_path,
+        "age": student.age,
+        "date_of_birth": student.date_of_birth.isoformat() if student.date_of_birth else None,
+        "phone": student.phone,
+        "education": student.education,
+        "experience": student.experience,
+        "linkedin_url": student.linkedin_url,
+        "github_url": student.github_url,
+        "portfolio_url": student.portfolio_url,
+        "skills_rating": student.skills_rating,
+        "resume_url": student.resume_url,
+        "profile_complete": profile_complete
     }
 
 
-@router.put("/me/skills")
-def update_skills(
-    skills: str,
-    db: Session = Depends(get_db),
-    user=Depends(get_current_user),
-):
-    """
-    Update student's skills string.
-    Frontend sends as query parameter: /students/me/skills?skills=Python,FastAPI
-    """
+# ========================================================
+# UPDATE FULL PROFILE (Save + Modify)
+# ========================================================
+@router.put("/me/profile")
+def update_profile(payload: StudentProfileUpdate,
+                   db: Session = Depends(get_db),
+                   user=Depends(get_current_user)):
+
     student = _get_or_create_student(db, user)
-    student.skills = skills
+
+    # user
+    if payload.full_name is not None:
+        user.full_name = payload.full_name
+
+    # student fields
+    for field, value in payload.dict(exclude_unset=True).items():
+        if hasattr(student, field):
+            setattr(student, field, value)
+
     db.commit()
-    return {"message": "Skills updated", "skills": student.skills}
+    return get_profile(db, user)
 
 
+# ========================================================
+# UPLOAD RESUME + save file path in DB
+# ========================================================
 @router.post("/me/resume")
-async def upload_resume(
-    file: UploadFile = File(...),
-    db: Session = Depends(get_db),
-    user=Depends(get_current_user),
-):
-    """
-    Save resume file to uploads/resumes.
-    We allow all file types.
-    """
+async def upload_resume(file: UploadFile = File(...),
+                        db: Session = Depends(get_db),
+                        user=Depends(get_current_user)):
+
     student = _get_or_create_student(db, user)
 
-    # Build a safe file name
+    RESUME_DIR.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.utcnow().strftime("%Y%m%d%H%M%S")
-    safe_name = f"student_{student.id}_{timestamp}_{file.filename}"
-    dest_path = RESUME_DIR / safe_name
+    filename = f"resume_{student.id}_{timestamp}_{file.filename}"
+    path = RESUME_DIR / filename
 
-    content = await file.read()
-    with open(dest_path, "wb") as f:
-        f.write(content)
+    with open(path, "wb") as f:
+        f.write(await file.read())
 
-    # Public URL served by FastAPI static mount
-    file_url = f"/uploads/resumes/{safe_name}"
-
-    # NEW: keep latest resume location on student profile,
-    # so admin can open it from applications screen
-    student.resume_path = file_url
+    student.resume_url = f"/uploads/resumes/{filename}"
     db.commit()
 
-    return {
-        "message": "Resume uploaded",
-        "file_url": file_url,
-    }
+    return {"message": "Resume Uploaded", "resume_url": student.resume_url}
 
-
-@router.post("/apply/{internship_id}")
-def apply(
-    internship_id: int,
-    db: Session = Depends(get_db),
-    user=Depends(get_current_user),
-):
-    student = db.query(models.Student).filter_by(user_id=user.id).first()
-    if not student:
-        student = models.Student(user_id=user.id)
-        db.add(student)
-        db.commit()
-        db.refresh(student)
-
-    existing = db.query(models.Application).filter_by(
-        student_id=student.id, internship_id=internship_id
-    ).first()
-    if existing:
-        raise HTTPException(status_code=400, detail="Already applied")
-
-    app = models.Application(
-        student_id=student.id, internship_id=internship_id, status="pending"
-    )
-    db.add(app)
-    db.commit()
-
-    return {"message": "Application Submitted"}
