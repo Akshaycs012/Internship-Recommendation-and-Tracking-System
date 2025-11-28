@@ -48,3 +48,25 @@ def apply_to_internship(
     db.add(app_obj)
     db.commit()
     return {"message": "Application submitted"}
+
+
+# ========== ADMIN — APPROVE / REJECT APPLICATION ==========
+@router.post("/update-status/{app_id}")
+def update_application_status(app_id: int, status: str,
+                              db: Session = Depends(get_db),
+                              admin=Depends(get_current_user)):
+
+    if admin.role != "admin":
+        raise HTTPException(status_code=403, detail="Admins only")
+
+    app = db.query(models.Application).filter(models.Application.id == app_id).first()
+    if not app:
+        raise HTTPException(status_code=404, detail="Application not found")
+
+    if status not in ["approved", "rejected"]:
+        raise HTTPException(status_code=400, detail="Invalid status")
+
+    app.status = status
+    db.commit()
+
+    return {"message": "Status updated", "status": status}

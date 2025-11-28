@@ -1,71 +1,68 @@
 # backend/app/api/deps.py
-
-from typing import Literal
-
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jose import jwt, JWTError
 from sqlalchemy.orm import Session
+from jose import jwt, JWTError
 
-from app.core.config import settings
 from app.db.database import get_db
 from app.db import models
+from app.core.config import settings
+
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 
-def get_current_user(
-    token: str = Depends(oauth2_scheme),
-    db: Session = Depends(get_db),
-) -> models.User:
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-
+# ---------------------- Get Current User (Core Auth) ---------------------- #
+def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     try:
+        # Decode using the same key/algorithm as used for token creation
         payload = jwt.decode(
             token,
             settings.JWT_SECRET_KEY,
             algorithms=[settings.JWT_ALGORITHM],
         )
-        user_id: str | None = payload.get("sub")
-        if user_id is None:
-            raise credentials_exception
-    except JWTError:
-        raise credentials_exception
+        user_id: int | None = payload.get("sub")
 
-    user = db.query(models.User).filter(models.User.id == int(user_id)).first()
-    if user is None:
-        raise credentials_exception
+        if not user_id:
+            raise JWTError()
 
-    return user
+        user = db.query(models.User).filter(models.User.id == int(user_id)).first()
+        if not user:
+            raise JWTError()
 
-
-def require_role(role: Literal["student", "mentor", "admin"]):
-    """
-    Dependency factory: require a specific role.
-    Usage in routes:  user = Depends(require_role("admin"))
-    """
-    def _wrapper(user: models.User = Depends(get_current_user)):
-        if user.role != role:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Requires {role} role",
-            )
         return user
 
-    return _wrapper
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired authentication token",
+        )
 
 
-def require_admin(user: models.User = Depends(require_role("admin"))):
-    return user
+# ---------------------- Student Only Access ---------------------- #
+def get_current_student(
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if current_user.role != "student":
+        raise HTTPException(status_code=403, detail="Students only")
+
+    student = db.query(models.Student).filter(models.Student.user_id == current_user.id).first()
+    if not student:
+        raise HTTPException(status_code=404, detail="Student profile missing")
+
+    return student
 
 
-def require_mentor(user: models.User = Depends(require_role("mentor"))):
-    return user
+# ---------------------- Admin Only Access ---------------------- #
+def require_admin(current_user: models.User = Depends(get_current_user)):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Admins only")
+    return current_user
 
 
-def require_student(user: models.User = Depends(require_role("student"))):
-    return user
+# ---------------------- Mentor Only Access ---------------------- #
+def require_mentor(current_user: models.User = Depends(get_current_user)):
+    if current_user.role != "mentor":
+        raise HTTPException(status_code=403, detail="Mentors only")
+    return current_user

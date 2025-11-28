@@ -23,7 +23,24 @@ def get_recommendations(
     db: Session = Depends(get_db),
     user=Depends(get_current_user),
 ):
-    user_skills = _normalize_skills(skills)
+    """
+    Recommendation logic:
+      - if `skills` query param is provided → use that
+      - else → use student.skills from DB
+      - compute basic text match + skill overlap score (0-100)
+    """
+    # Determine skill source
+    if skills:
+        skills_source = skills
+    else:
+        student = (
+            db.query(models.Student)
+            .filter(models.Student.user_id == user.id)
+            .first()
+        )
+        skills_source = student.skills if student else ""
+
+    user_skills = _normalize_skills(skills_source)
 
     internships = db.query(models.Internship).all()
     results = []

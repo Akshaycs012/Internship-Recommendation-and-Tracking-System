@@ -1,23 +1,26 @@
+# backend/app/main.py
+
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse, HTMLResponse
 
 from app.db.database import Base, engine
-from app.db import models
-
 from app.api.routes import (
-    auth,
-    students,
-    internships,
-    applications,
-    progress,
-    mentor,
-    admin,
-    chatbot,
+    auth, students, internships, applications,
+    progress, mentor, admin, chatbot
 )
 
-# ✅ Correct table creation
+# ==== Paths ====
+BASE_DIR      = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+FRONTEND_DIR  = os.path.join(BASE_DIR, "frontend")
+UPLOADS_DIR   = os.path.join(BASE_DIR, "uploads")
+
+os.makedirs(UPLOADS_DIR, exist_ok=True)
 Base.metadata.create_all(bind=engine)
 
+# ==== App ====
 app = FastAPI(title="Internship Portal API")
 
 app.add_middleware(
@@ -28,30 +31,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
-import os
+# ==== Static Serving (fixed) ====
+app.mount("/static",  StaticFiles(directory=os.path.join(FRONTEND_DIR, "assets")), name="static")
+app.mount("/uploads", StaticFiles(directory=UPLOADS_DIR), name="uploads")
 
+# ==== Serve HTML Pages ====
+@app.get("/", response_class=HTMLResponse)
+def serve_home():
+    return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))
 
-frontend_path = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "..", "frontend")
-)
-
-# Serve assets folder
-app.mount("/assets", StaticFiles(directory=os.path.join(frontend_path, "assets")), name="assets")
-
-@app.get("/")
-def serve_index():
-    return FileResponse(os.path.join(frontend_path, "index.html"))
-
-@app.get("/{page}")
+@app.get("/{page}", response_class=HTMLResponse)
 def serve_page(page: str):
-    file_path = os.path.join(frontend_path, page)
-    if os.path.exists(file_path):
-        return FileResponse(file_path)
-    return {"detail": "Not Found"}
+    file = os.path.join(FRONTEND_DIR, page)
+    return FileResponse(file) if os.path.exists(file) else HTMLResponse("404", status_code=404)
 
-
+# ==== API Routes ====
 app.include_router(auth.router)
 app.include_router(students.router)
 app.include_router(internships.router)
@@ -62,5 +56,5 @@ app.include_router(admin.router)
 app.include_router(chatbot.router)
 
 @app.get("/health")
-def health_check():
+def health():
     return {"status": "ok"}
